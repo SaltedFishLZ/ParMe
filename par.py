@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 import calendar
 
 import numpy as np
@@ -7,6 +8,10 @@ import scipy.sparse as sp
 import networkx as nx
 import gurobipy as gp
 from gurobipy import GRB
+
+from utils import grb_vars_shape, grb_vars_to_ndarray
+from EleNetX.mpdl import *
+from EleNetX.visualize import plot_ele_nx
 
 
 def get_par_constraints(X:gp.tupledict,
@@ -43,7 +48,7 @@ def get_par_objective(X:gp.tupledict,
     # enumerate node k1, k2, and subgraph j
     cut_size = gp.quicksum(X[k1, j] * val * X[k2, j]
                            for (k1, k2, val) in zip(L.row, L.col, L.data)
-                           for j in range(l))
+                           for j in range(m))
     cut_size = cut_size * 0.5 # remove duplication
     return cut_size
 
@@ -51,22 +56,21 @@ def get_par_objective(X:gp.tupledict,
 def get_par_model(L, m=2, gamma=0.1):
     """
     """
+    model = gp.Model("quadratic-programming graph partition")
+
     l, _ = L.shape
     max_size = np.ceil(l / m) * (1 + gamma)
 
-    model = gp.Model("quadratic-programming graph partition")
-
-    # variables
+    # set variables
     X = model.addVars(l, m, vtype=GRB.BINARY)
 
-    # constraints
+    # set constraints
     par_constrs = get_par_constraints(X, max_size, 0)
     for constrs in par_constrs:
         model.addConstrs(par_constrs[constrs], name=constrs)
 
-    # objective
-    cut_size = get_par_objective(C, L)
-
+    # set objective
+    cut_size = get_par_objective(X, L)
     model.setObjective(cut_size)
 
     # Gurobi configuration
@@ -77,4 +81,31 @@ def get_par_model(L, m=2, gamma=0.1):
     model.setParam("LogToConsole", 0)
 
     model.update()
-    return model, C
+    return model, X
+
+
+if __name__ == "__main__":
+    FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    logging.basicConfig(format=FORMAT, level=logging.INFO)
+
+
+    graphs = []
+    gnames = []
+
+    neural_net = 'resnet50'
+    gpath = compose_graph_path(neural_net, 0)
+    print(gpath)
+
+    G = nx.read_gpickle(gpath)
+    L = nx.laplacian_matrix(G)
+    L = L.tocoo()
+
+    l, _ = L.shape
+    m = 2
+    print(l)
+
+    model, X = get_par_model(L, m=4)
+    model.optimize()
+
+    X = grb_vars_to_ndarray(X).astype(int)
+    print(X)
