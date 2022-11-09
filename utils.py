@@ -3,7 +3,8 @@ __all__ = [
     "grb_vars_to_ndarray",
     "indicator_to_assignment",
     "assignment_to_cluster",
-    "indicator_to_cluster"
+    "indicator_to_cluster",
+    "sorted_assignment"
 ]
 
 import numpy as np
@@ -74,3 +75,45 @@ def indicator_to_cluster(indicator:np.ndarray) -> dict:
     assignment = indicator_to_assignment(indicator)
     cluster = assignment_to_cluster(assignment)
     return cluster
+
+
+def assignment_to_string(a: np.ndarray) -> str:
+    """get the string representation of each assignee
+    """
+    s = ''.join(map(str, a))
+    return s
+
+
+def string_to_assignment(s: str) -> np.ndarray:
+    a = [*s]
+    a = [int(c) for c in a]
+    return np.asarray(a, dtype=int)
+
+
+def sorted_assignment(a: np.ndarray,
+                      axis: int,
+                      with_index=False) -> np.ndarray:
+    """Sort assignment matrix as strings
+    :param axis: which axis is the assignee
+    """
+    assert len(a.shape) == 2, NotImplementedError()
+    assert axis == 0, NotImplementedError()
+
+    strings = []
+    if (axis == 0):
+        for i in range(a.shape[axis]):
+            s = assignment_to_string(a[i, :])
+            strings.append(s)
+    
+        sorted_strings = sorted(strings)
+        index = np.argsort(strings)
+
+        a_sorted = [string_to_assignment(s) for s in sorted_strings]
+        a_sorted = np.stack(a_sorted, axis=axis)
+    else:
+        raise NotImplementedError()
+
+    if with_index:
+        return (a_sorted, index)
+    else:
+        return a_sorted
