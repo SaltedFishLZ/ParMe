@@ -1,0 +1,8 @@
+# conda requirements
+
+scipy=1.7.3
+networkx=2.6.3
+graphviz=2.50.0
+pygraphviz=1.9
+matplotlib=3.5.1
+gurobi=9.5.0
