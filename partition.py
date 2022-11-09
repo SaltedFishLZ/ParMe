@@ -86,11 +86,11 @@ def get_partition_model(L:sp.coo_matrix,
     cut_size += get_partition_objective(X, L)
     model.setObjective(cut_size)
 
-    # update model and Gurobi configuration
-    model.update()
+    # add Gurobi configuration and update model 
     model.setParam("LogFile", log_file)
     model.setParam("LogToConsole", 0)
     model.setParam('TimeLimit', 20 * 60)
+    model.update()
     
     return model, X
 
