@@ -16,10 +16,10 @@ from EleNetX.visualize import plot_ele_nx
 # Global Gurobi setting
 current_GMT = time.gmtime()
 timestamp = calendar.timegm(current_GMT)
-log_file = "gurobi.par.{}.log".format(timestamp)
+log_file = "gurobi.partition.{}.log".format(timestamp)
 
 
-def get_par_constraints(X:gp.tupledict,
+def get_partition_constraints(X:gp.tupledict,
                         w:np.ndarray,
                         max_size,
                         min_size) -> dict:
@@ -41,13 +41,13 @@ def get_par_constraints(X:gp.tupledict,
                >= min_size for j in range(m))
 
     return {
-        "Par:unique-subgraph-assignment"    :   unique_assign,
-        "Par:cluster-size-upper-bound"      :   size_ub,
-        "Par:cluster-size-lower-bound"      :   size_lb
+        "Partition:unique-subgraph-assignment"  :   unique_assign,
+        "Partition:cluster-size-upper-bound"    :   size_ub,
+        "Partition:cluster-size-lower-bound"    :   size_lb
     }
 
 
-def get_par_objective(X:gp.tupledict,
+def get_partition_objective(X:gp.tupledict,
                       L:sp.coo_matrix) -> gp.QuadExpr:
     """ Get partition objective for each individual graph
     """
@@ -60,7 +60,7 @@ def get_par_objective(X:gp.tupledict,
     return cut_size
 
 
-def get_par_model(L:sp.coo_matrix,
+def get_partition_model(L:sp.coo_matrix,
                   w:np.ndarray,
                   m:int,
                   max_size,
@@ -75,15 +75,15 @@ def get_par_model(L:sp.coo_matrix,
     X = model.addVars(l, m, vtype=GRB.BINARY)
 
     # set constraints
-    par_constrs = get_par_constraints(X, w=w,
+    partition_constrs = get_partition_constraints(X, w=w,
                                       max_size=max_size,
                                       min_size=min_size)
-    for constrs in par_constrs:
-        model.addConstrs(par_constrs[constrs], name=constrs)
+    for constrs in partition_constrs:
+        model.addConstrs(partition_constrs[constrs], name=constrs)
 
     # set objective
     cut_size = 0.0
-    cut_size += get_par_objective(X, L)
+    cut_size += get_partition_objective(X, L)
     model.setObjective(cut_size)
 
     # update model and Gurobi configuration
@@ -95,7 +95,7 @@ def get_par_model(L:sp.coo_matrix,
     return model, X
 
 
-def get_par_nG_model(Ls:list,
+def get_partition_nG_model(Ls:list,
                      ws:list,
                      max_size,
                      min_size):
@@ -121,14 +121,14 @@ def get_par_nG_model(Ls:list,
         Xs.append(X)
 
         # set constraints
-        par_constrs = get_par_constraints(X, w=w,
+        partition_constrs = get_partition_constraints(X, w=w,
                                         max_size=max_size,
                                         min_size=min_size)
-        for constrs in par_constrs:
-            model.addConstrs(par_constrs[constrs], name=constrs)
+        for constrs in partition_constrs:
+            model.addConstrs(partition_constrs[constrs], name=constrs)
 
         # update objective
-        cut_size += get_par_objective(X, L)
+        cut_size += get_partition_objective(X, L)
     
     # set objective
     model.setObjective(cut_size)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
     # w = np.ones(l)
 
-    # model, X = get_par_model(L, w=w, m=m, max_size=max_size, min_size=min_size)
+    # model, X = get_partition_model(L, w=w, m=m, max_size=max_size, min_size=min_size)
     # model.optimize()
 
     # if (model.status == GRB.OPTIMAL or
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     max_size = 20
     min_size = 10
 
-    model, Xs = get_par_nG_model(Ls, ws, max_size, min_size)
+    model, Xs = get_partition_nG_model(Ls, ws, max_size, min_size)
     model.optimize()
 
     if (model.status == GRB.OPTIMAL or
