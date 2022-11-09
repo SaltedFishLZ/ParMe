@@ -3,6 +3,7 @@ import time
 import pickle
 import logging
 import calendar
+from typing import Union
 
 import numpy as np
 import gurobipy as gp
@@ -14,11 +15,11 @@ from utils import grb_vars_to_ndarray, grb_vars_shape
 # Global Gurobi setting
 current_GMT = time.gmtime()
 timestamp = calendar.timegm(current_GMT)
-log_file = "gurobi.bilinear.{}.log".format(timestamp)
+log_file = "gurobi.merge.{}.log".format(timestamp)
 
 
-def get_merge_constraints(Z: gp.tupledict,
-                          R_sup: gp.tupledict,
+def get_merge_constraints(R_sup: gp.tupledict,
+                          Z: gp.tupledict,
                           R: np.ndarray) -> dict:
     """
     :param Z: shape $t \times m$, t templates, m subgraphs
@@ -46,17 +47,17 @@ def get_merge_constraints(Z: gp.tupledict,
     }
 
 
-def get_merge_objective(Z: gp.tupledict,
-                        R_sup: gp.tupledict,
-                        w0: np.ndarray,
-                        q: np.ndarray) -> gp.QuadExpr:
+def get_merge_objective(R_sup: gp.tupledict,
+                        Z: gp.tupledict,
+                        q: np.ndarray,
+                        w0: np.ndarray) -> gp.QuadExpr:
     """
-    :param Z: template assignment, 
-              shape $t \times m$, t templates, m subgraphs
     :param R_sup: resource upper bound $\overline{R}$,
                   shape $r \times t$, r resources, t templates
-    :param w0: weight for each type of resource, shape $r$
+    :param Z: template assignment, 
+              shape $t \times m$, t templates, m subgraphs
     :param q: quantity/volume for each subgraph, shape $m$
+    :param w0: weight for each type of resource, shape $r$
     :return: a Gurobi expression
     """
     t, m = grb_vars_shape(Z)
@@ -81,23 +82,42 @@ def get_merge_objective(Z: gp.tupledict,
     return cost
 
 
-def get_merge_model(R, w0, q, r, t, m):
+def get_merge_model(R: Union[np.ndarray, gp.tupledict],
+                    t: int,
+                    q: np.ndarray,
+                    w0: np.ndarray):
     """
+    :param R: shape $r \times m$
+    :param t: number of templates
+    :param q: q vector, shape m
+    :param w0: node weight of each resource, shape r
     """
-    model = gp.Model("bilinear design merge")
+    if isinstance(R, np.ndarray):
+        r, m = R.shape
+    elif isinstance(R, gp.tupledict):
+        r, m = grb_vars_shape(R)
+    (m_, ) = q.shape; assert m_ == m, ValueError()
+    (r_, ) = w0.shape; assert r_ == r, ValueError()
 
+    model = gp.Model("bilinear graph merge")
+    
     # set variables
     Z = model.addVars(t, m, name="Z", vtype=GRB.BINARY)
     R_sup = model.addVars(r, t, name="R_sup")
 
     # set constraints
-    merge_constrs = get_merge_constraints(Z, R_sup, R)
+    merge_constrs = get_merge_constraints(R_sup=R_sup,
+                                          Z=Z,
+                                          R=R)
     for constrs in merge_constrs:
         model.addConstrs(merge_constrs[constrs], name=constrs)
 
     # set objective
     cost = 0.0
-    cost += get_merge_objective(Z, R_sup, w0, q)
+    cost += get_merge_objective(R_sup=R_sup,
+                                Z=Z,
+                                q=q,
+                                w0=w0)
     model.setObjective(cost, GRB.MINIMIZE)
 
     # add Gurobi configuration and update model 
@@ -109,10 +129,9 @@ def get_merge_model(R, w0, q, r, t, m):
     return model, Z, R_sup
 
 
-
 if __name__ == "__main__":
     # read input
-    fpath = os.path.join("data", "random", "random.003.pkl")
+    fpath = os.path.join("data", "random", "random.006.pkl")
     with open(fpath, "rb") as fin:
         fdict = pickle.load(fin)
     
@@ -123,7 +142,7 @@ if __name__ == "__main__":
     R = fdict["R"]; w0 = fdict["c"]; q = fdict["v"]
     print(q)
 
-    model, Z, R_sup = get_merge_model(R=R, w0=w0, q=q, r=r, t=t, m=m)
+    model, Z, R_sup = get_merge_model(R=R, q=q, t=t, w0=w0)
 
     # Optimize
     model.optimize()
