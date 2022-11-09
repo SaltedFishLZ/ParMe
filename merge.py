@@ -23,7 +23,7 @@ log_file = "gurobi.merge.{}.log".format(timestamp)
 
 def get_merge_constraints(R_sup: gp.tupledict,
                           Z: gp.tupledict,
-                          R: np.ndarray) -> dict:
+                          R: tensor) -> dict:
     """
     :param Z: shape $t \times m$, t templates, m subgraphs
     :param R_sup: shape $r \times t$, r resources, t templates
@@ -31,7 +31,11 @@ def get_merge_constraints(R_sup: gp.tupledict,
     """
     t, m = grb_vars_shape(Z)
     r, t_ = grb_vars_shape(R_sup); assert t == t_, ValueError()
-    r_, m_ = R.shape; assert r == r_, ValueError(); assert m == m_, ValueError();
+    if isinstance(R, np.ndarray):
+        r_, m_ = R.shape
+    elif isinstance(R, gp.tupledict):
+        r_, m_ = grb_vars_shape(R)
+    assert r == r_, ValueError(); assert m == m_, ValueError()
 
     # (1) unique template assignment
     # each subgraph will be assign to EXACTLY merged design
