@@ -119,30 +119,9 @@ def get_parme_model(
     # set Gurobi objective
     objective = theta * rho + (1 - theta) * phi
     model.setObjective(objective)
-
-    # update model and Gurobi configuration
     model.update()
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 10 * 60)
 
     return model, (Xs, Zs, R_sup, Rs), (rho, phi)
-
-
-def get_R_max(R: np.ndarray,
-              Z: np.ndarray):
-    """
-    :paran R: size $r \times m$
-    "param Z: size $t \times m$
-
-    """
-    assert isinstance(R, np.ndarray), NotImplementedError()
-    assert isinstance(Z, np.ndarray), NotImplementedError()
-    r, m = R.shape; t, m_ = Z.shape
-    assert m_ == m, ValueError("Size mismatch")
-    # use einsum without reduction
-    R_max = np.max(np.einsum('ij,kj->ikj', R, Z), axis=-1)
-    return R_max
 
 
 if __name__ == "__main__":
@@ -216,6 +195,12 @@ if __name__ == "__main__":
     model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
                                                  min_size=min_size, max_size=max_size,
                                                  theta=theta)
+    # update model and Gurobi configuration
+    model.update()
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', 1 * 60)
+
     model.optimize()
 
     (Xs, Zs, R_sup, Rs) = grb_vars

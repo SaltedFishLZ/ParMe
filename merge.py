@@ -9,7 +9,8 @@ import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
 
-from utils import grb_vars_to_ndarray, grb_vars_shape, \
+from utils import grb_vars_to_ndarray, \
+                  grb_vars_shape, \
                   sorted_assignment
 
 
@@ -128,11 +129,6 @@ def get_merge_model(R: tensor,
                                 q=q,
                                 w0=w0)
     model.setObjective(cost, GRB.MINIMIZE)
-
-    # add Gurobi configuration and update model 
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 20 * 60)
     model.update()
 
     return model, Z, R_sup
@@ -188,11 +184,6 @@ def get_merge_nG_model(Rs: List[tensor],
                                     w0=w0)
 
     model.setObjective(cost, GRB.MINIMIZE)
-
-    # add Gurobi configuration and update model 
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 20 * 60)
     model.update()
 
     return model, Zs, R_sup
@@ -218,6 +209,11 @@ if __name__ == "__main__":
 
     model, Z, R_sup = get_merge_model(R=R, q=q, t=t, w0=w0)
 
+    # add Gurobi configuration
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', 20 * 60)
+
     # Optimize
     model.optimize()
 
@@ -236,6 +232,11 @@ if __name__ == "__main__":
     Rs = [R[:, 0 : (m // 2)], R[:, (m // 2) : ]]
     qs = [q[0 : (m // 2)], q[(m // 2) : ]]
     model, Zs, R_sup = get_merge_nG_model(Rs=Rs, qs=qs, t=t, w0=w0)
+
+    # add Gurobi configuration
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', 20 * 60)
 
     model.optimize()
     Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]

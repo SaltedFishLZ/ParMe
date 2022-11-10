@@ -82,16 +82,10 @@ def get_partition_model(L:sp.coo_matrix,
         model.addConstrs(partition_constrs[constrs], name=constrs)
 
     # set objective
-    cut_size = 0.0
-    cut_size += get_partition_objective(X, L)
+    cut_size = get_partition_objective(X, L)
     model.setObjective(cut_size)
-
-    # add Gurobi configuration and update model 
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 20 * 60)
-    model.update()
     
+    model.update()
     return model, X
 
 
@@ -132,13 +126,8 @@ def get_partition_nG_model(Ls:list,
     
     # set objective
     model.setObjective(cut_size)
-
-    # update model and Gurobi configuration
-    model.update()
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 20 * 60)
     
+    model.update()
     return model, Xs
 
 
@@ -169,6 +158,13 @@ if __name__ == "__main__":
     # w = np.ones(l)
 
     # model, X = get_partition_model(L, w=w, m=m, max_size=max_size, min_size=min_size)
+
+    # # add Gurobi configuration and update model 
+    # model.setParam("LogFile", log_file)
+    # model.setParam("LogToConsole", 0)
+    # model.setParam('TimeLimit', 20 * 60)
+    # model.update()
+
     # model.optimize()
 
     # if (model.status == GRB.OPTIMAL or
@@ -213,6 +209,13 @@ if __name__ == "__main__":
     min_size = 10
 
     model, Xs = get_partition_nG_model(Ls, ws, max_size, min_size)
+
+    # add Gurobi configuration and update model 
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', 20 * 60)
+    model.update()
+
     model.optimize()
 
     if (model.status == GRB.OPTIMAL or
