@@ -148,7 +148,7 @@ if __name__ == "__main__":
     n = len(Gs); r = len(module_indices)
     Ls = []; R0s = []
     w0 = np.ones(r)
-    q = np.asarray([1, 1, 1])
+    q = np.asarray([1, 1, 1, 1])
     t = 2; theta = 0.2
     min_size = 8
     max_size = 16
@@ -168,44 +168,63 @@ if __name__ == "__main__":
         plot_input(G, name)
 
 
-    model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
-                                                 min_size=min_size, max_size=max_size,
-                                                 theta=theta)
-    # update model and Gurobi configuration
-    model.update()
-    model.setParam("LogFile", log_file)
-    model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', 10)
+    for theta in np.linspace(0.0, 0.9, 10):
+        print("=" * 64)
+        print('theta =', theta)
+        model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
+                                                     min_size=min_size, max_size=max_size,
+                                                     theta=theta)
+        # update model and Gurobi configuration
+        model.update()
+        model.setParam("LogFile", log_file)
+        model.setParam("LogToConsole", 0)
+        model.setParam('TimeLimit', 30 * 60)
 
-    model.optimize()
+        model.optimize()
 
-    (Xs, Zs, R_sup, Rs) = grb_vars
-    (rho, phi) = grb_exprs
+        if (model.status == GRB.OPTIMAL or
+            model.status == GRB.TIME_LIMIT or
+            model.status == GRB.NODE_LIMIT or
+            model.status == GRB.ITERATION_LIMIT or
+            model.status == GRB.USER_OBJ_LIMIT):
+            # get a solution
+            if model.status == GRB.TIME_LIMIT:
+                print("time limit")
+            if model.status == GRB.OPTIMAL:
+                print("get optimal")
+            
 
-    Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-    Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
-    Rs = [grb_vars_to_ndarray(R) for R in Rs]
-    R_sup = grb_vars_to_ndarray(R_sup)
+            if model.SolCount > 1:
 
+                (Xs, Zs, R_sup, Rs) = grb_vars
+                (rho, phi) = grb_exprs
 
-    print("rho:", rho.getValue())
-    print("phi:", phi.getValue())
+                print("rho:", rho.getValue())
+                print("phi:", phi.getValue())
 
-    # generate output figures
-    for i, name in enumerate(Gs):
-        print(i, name)
-        G = Gs[name]
-        X = Xs[i]
-        fig_name = "{}:t={:02d}:theta={:.03f}".format(
-            name, t, theta
-        )
-        plot_output(G, X, fig_name)
+                np_Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
+                np_Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+                np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
+                np_R_sup = grb_vars_to_ndarray(R_sup)
 
-    # check the optimality of R_sup
-    R_cat = np.concatenate(Rs, axis=-1)
-    Z_cat = np.concatenate(Zs, axis=-1)
-    print(R_cat.shape)
-    print(Z_cat.shape)
-    R_max = get_R_max(R_cat, Z_cat)
-    print(np.sum((R_max - R_sup) ** 2))
-    print(R_sup)
+                # generate output figures
+                for i, name in enumerate(Gs):
+                    print(i, name)
+                    G = Gs[name]
+                    np_X = np_Xs[i]
+                    fig_name = "{}:t={:02d}:theta={:.03f}".format(
+                        name, t, theta
+                    )
+                    plot_output(G, np_X, fig_name)
+
+                # # check the optimality of R_sup
+                # R_cat = np.concatenate(Rs, axis=-1)
+                # Z_cat = np.concatenate(Zs, axis=-1)
+                # print(R_cat.shape)
+                # print(Z_cat.shape)
+                # R_max = get_R_max(R_cat, Z_cat)
+                # print(np.sum((R_max - R_sup) ** 2))
+                # print(R_sup)
+            
+            else:
+                print('No feasible solution found')
