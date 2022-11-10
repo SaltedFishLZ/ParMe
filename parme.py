@@ -98,6 +98,7 @@ def get_parme_model(
         # connection equation as constraints:
         # R = R0 X
         R = model.addVars(r, m, name="R")
+        Rs.append(R)
         model.addConstrs(R[i, j] == gp.quicksum(R0[i, k] * X[k, j] for k in range(l))
                          for i in range(r)
                          for j in range(m))
@@ -110,7 +111,8 @@ def get_parme_model(
             model.addConstrs(merge_constrs[constrs], name=constrs)
         # update objective
         phi_i = get_merge_objective(R_sup=R_sup, Z=Z,
-                                    q=np.ones(m) * q[i],
+                                    # subgraphs in G^(i) are equally weighted
+                                    q=np.ones(m),
                                     w0=w0)
         phi += q[i] * phi_i
 
@@ -125,6 +127,22 @@ def get_parme_model(
     model.setParam('TimeLimit', 10 * 60)
 
     return model, (Xs, Zs, R_sup, Rs), (rho, phi)
+
+
+def get_R_max(R: np.ndarray,
+              Z: np.ndarray):
+    """
+    :paran R: size $r \times m$
+    "param Z: size $t \times m$
+
+    """
+    assert isinstance(R, np.ndarray), NotImplementedError()
+    assert isinstance(Z, np.ndarray), NotImplementedError()
+    r, m = R.shape; t, m_ = Z.shape
+    assert m_ == m, ValueError("Size mismatch")
+    # use einsum without reduction
+    R_max = np.max(np.einsum('ij,kj->ikj', R, Z), axis=-1)
+    return R_max
 
 
 if __name__ == "__main__":
@@ -169,7 +187,7 @@ if __name__ == "__main__":
     print(module_indices)
 
     l = len(G.nodes)
-    print("G has ", l, "nodes")
+    print("G has", l, "nodes")
     r = len(module_indices)
 
     # obtain coef data
@@ -181,18 +199,18 @@ if __name__ == "__main__":
         k = module_indices[G.nodes[v]["modulename"]]
         R0[k, j] = 1
     
-    print(R0)
-    print(l)
+    # print(R0)
+    # print(l)
 
     n = 2
     Ls = [L, ] * n
     R0s = [R0, ] * n
-    q = np.asarray([1, 1])
+    q = np.asarray([1, 2])
     w0 = np.ones(r)
 
-    t = 3; theta = 0.0
-    min_size = 10
-    max_size = 25
+    t = 2; theta = 0.2
+    min_size = 8
+    max_size = 16
 
 
     model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
@@ -203,15 +221,18 @@ if __name__ == "__main__":
     (Xs, Zs, R_sup, Rs) = grb_vars
     (rho, phi) = grb_exprs
 
-    for X in Xs:
-        X = grb_vars_to_ndarray(X).astype(int)
-        print(X)
-    
-    for Z in Zs:
-        Z = grb_vars_to_ndarray(Z).astype(int)
-        print(Z)
-    
+    Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
+    Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+    Rs = [grb_vars_to_ndarray(R) for R in Rs]
     R_sup = grb_vars_to_ndarray(R_sup)
+
+    R_cat = np.concatenate(Rs, axis=-1)
+    Z_cat = np.concatenate(Zs, axis=-1)
+    print(R_cat.shape)
+    print(Z_cat.shape)
+    R_max = get_R_max(R_cat, Z_cat)
+    print(np.sum((R_max - R_sup) ** 2))
+    print(R_sup)
 
     print("rho:", rho.getValue())
     print("phi:", phi.getValue())
