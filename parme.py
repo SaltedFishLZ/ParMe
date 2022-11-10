@@ -42,7 +42,9 @@ def get_parme_model(
     t: int,
     max_size,
     min_size,
-    theta
+    theta,
+    rho_star: float = 1.0,
+    phi_star: float = 1.0
 ):
     """
     """
@@ -119,12 +121,16 @@ def get_parme_model(
                                     w0=w0)
         phi += q[i] * phi_i
 
+    # normalize 2 objectives
+    rho_tilde = rho / rho_star
+    phi_tilde = phi / phi_star
+
     # set Gurobi objective
-    objective = theta * rho + (1 - theta) * phi
+    objective = theta * rho_tilde + (1 - theta) * phi_tilde
     model.setObjective(objective)
     model.update()
 
-    return model, (Xs, Zs, R_sup, Rs), (rho, phi)
+    return model, (Xs, Zs, R_sup, Rs), (rho_tilde, phi_tilde)
 
 
 if __name__ == "__main__":
