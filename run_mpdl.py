@@ -95,6 +95,44 @@ def plot_input(G, name):
     os.makedirs(dir_path, exist_ok=True)
     png_path = os.path.join(dir_path, '{}.png'.format(name))
     plt.savefig(png_path)
+    plt.clf(); plt.cla(); plt.close()
+
+
+def plot_output(G: nx.Graph,
+                X: np.ndarray,
+                name: str):
+    """
+    :param G:
+    :param X: $l \times m$
+    """
+    l = len(G.nodes)
+    l_, m = X.shape
+    assert l_ == l, ValueError('Shape mismatch')
+
+    sgids = indicator_to_assignment(X, axis=1)
+
+    print('=' * 64)
+    print('# nodes: ', l)
+    print('# subgraphs:', m)
+    print('cluster id for nodes in ', name)
+    print(sgids)
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = plt.axes()
+
+    from networkx.drawing.nx_agraph import graphviz_layout
+    pos = graphviz_layout(G)
+    
+    nx.draw_networkx(G, ax=ax, pos=pos,
+                     node_color=sgids,
+                     cmap=plt.cm.magma, 
+                     with_labels=False)
+
+    dir_path = os.path.join('figures', 'mpdl')
+    os.makedirs(dir_path, exist_ok=True)
+    png_path = os.path.join(dir_path, '{}.png'.format(name))
+    plt.savefig(png_path)
+    plt.clf(); plt.cla(); plt.close()
 
 
 if __name__ == "__main__":
@@ -111,7 +149,7 @@ if __name__ == "__main__":
     Ls = []; R0s = []
     w0 = np.ones(r)
     q = np.asarray([1, 1, 1])
-    t = 4; theta = 0.0
+    t = 2; theta = 0.2
     min_size = 8
     max_size = 16
     # update inputs for ParMe
@@ -130,32 +168,44 @@ if __name__ == "__main__":
         plot_input(G, name)
 
 
-    # model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
-    #                                              min_size=min_size, max_size=max_size,
-    #                                              theta=theta)
-    # # update model and Gurobi configuration
-    # model.update()
-    # model.setParam("LogFile", log_file)
-    # model.setParam("LogToConsole", 0)
-    # model.setParam('TimeLimit', 2 * 60)
+    model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
+                                                 min_size=min_size, max_size=max_size,
+                                                 theta=theta)
+    # update model and Gurobi configuration
+    model.update()
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', 10)
 
-    # model.optimize()
+    model.optimize()
 
-    # (Xs, Zs, R_sup, Rs) = grb_vars
-    # (rho, phi) = grb_exprs
+    (Xs, Zs, R_sup, Rs) = grb_vars
+    (rho, phi) = grb_exprs
 
-    # Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-    # Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
-    # Rs = [grb_vars_to_ndarray(R) for R in Rs]
-    # R_sup = grb_vars_to_ndarray(R_sup)
+    Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
+    Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+    Rs = [grb_vars_to_ndarray(R) for R in Rs]
+    R_sup = grb_vars_to_ndarray(R_sup)
 
-    # R_cat = np.concatenate(Rs, axis=-1)
-    # Z_cat = np.concatenate(Zs, axis=-1)
-    # print(R_cat.shape)
-    # print(Z_cat.shape)
-    # R_max = get_R_max(R_cat, Z_cat)
-    # print(np.sum((R_max - R_sup) ** 2))
-    # print(R_sup)
 
-    # print("rho:", rho.getValue())
-    # print("phi:", phi.getValue())
+    print("rho:", rho.getValue())
+    print("phi:", phi.getValue())
+
+    # generate output figures
+    for i, name in enumerate(Gs):
+        print(i, name)
+        G = Gs[name]
+        X = Xs[i]
+        fig_name = "{}:t={:02d}:theta={:.03f}".format(
+            name, t, theta
+        )
+        plot_output(G, X, fig_name)
+
+    # check the optimality of R_sup
+    R_cat = np.concatenate(Rs, axis=-1)
+    Z_cat = np.concatenate(Zs, axis=-1)
+    print(R_cat.shape)
+    print(Z_cat.shape)
+    R_max = get_R_max(R_cat, Z_cat)
+    print(np.sum((R_max - R_sup) ** 2))
+    print(R_sup)

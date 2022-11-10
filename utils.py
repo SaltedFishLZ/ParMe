@@ -55,10 +55,11 @@ def grb_vars_to_ndarray(vars:gp.tupledict,
     return array
 
 
-def indicator_to_assignment(indicator:np.ndarray) -> np.ndarray:
+def indicator_to_assignment(indicator: np.ndarray,
+                            axis: int = 1) -> np.ndarray:
     """
     """
-    assignment = np.argmax(indicator, axis=1)
+    assignment = np.argmax(indicator, axis=axis)
     return assignment
 
 
