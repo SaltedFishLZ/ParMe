@@ -5,6 +5,7 @@ import time
 import pickle
 import logging
 import calendar
+import argparse
 from typing import List, Dict
 
 if sys.version <= "3.7":
@@ -34,6 +35,93 @@ from parme import get_parme_model
 current_GMT = time.gmtime()
 timestamp = calendar.timegm(current_GMT)
 log_file = "gurobi.ParMe.{}.log".format(timestamp)
+
+
+def get_argparser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description='ParMe experiment parser.'
+    )
+    parser.add_argument('--t', '-t',
+                        type=int, default=1,
+                        help='number of templates')
+    parser.add_argument('--theta', metavar='[0, 1]',
+                        type=float, default=0.0,
+                        help='weight for the cut size objective')
+    parser.add_argument('--max-size',
+                        type=float, required=True,
+                        help='max size of each subgraph')
+    parser.add_argument('--min-size',
+                        type=float, required=True,
+                        help='min size of each subgraph')
+    parser.add_argument('--w0', metavar='%f', nargs='+',
+                        type=float, default=None, 
+                        help='node weights for each type of resource')
+    parser.add_argument('--q', '-q', metavar='%f', nargs='+',
+                        type=float, default=None, 
+                        help='quantity weight for each G')
+    parser.add_argument('--time', metavar='TIME',
+                        type=float, default=5,
+                        help='run time limit (min) for each optimization')
+    parser.add_argument('--rho-star', metavar='rho*',
+                        type=float, default=1.,
+                        help='precalculated rho* used to scale rho')
+    parser.add_argument('--phi-star', metavar='phi*',
+                        type=float, default=1.,
+                        help='precalculated phi* used to scale phi')
+    return parser
+
+
+def get_parameters(args, Gs, module_indices, echo=True):
+    """parse ParMe parameters and make sanity check
+    """
+    n = len(Gs); r = len(module_indices)
+    
+    t = args.t
+    assert t > 0, ValueError()
+
+    theta = args.theta
+    assert theta >= 0.0,  ValueError()
+    assert theta <= 1.0, ValueError()
+    
+    if args.w0 is None:
+        w0 = np.ones(r)
+    else:
+        w0 = np.asarray(args.w0)
+        assert len(w0) == r, ValueError()
+    
+    if args.q is None:
+        q = np.ones(n)
+    else:
+        q = np.asarray(args.q)
+        assert len(q) == n, ValueError()
+    
+    max_size = args.max_size
+    min_size = args.min_size
+    assert max_size > min_size, ValueError()
+
+    time = args.time
+    assert time > 0., ValueError()
+
+    rho_star = args.rho_star
+    assert rho_star > 1e-20, ValueError()
+
+    phi_star = args.phi_star
+    assert phi_star > 1e-20, ValueError()
+
+    if echo:
+        print('[n]', n); print('[r]', r)
+        print('[module/resource index]', module_indices)
+        print('[t]', t)
+        print('[theta]', theta)
+        print('[w0]', w0)
+        print('[q]', q)
+        print('[max size]', max_size)
+        print('[min size]', min_size)
+        print('[time]', time)
+        print('[rho_star]', rho_star)
+        print('[phi_star]', phi_star)
+
+    return (t, theta, w0, q, max_size, min_size, time, rho_star, phi_star)
 
 
 def load_graphs() -> Dict[str, nx.Graph]:
@@ -111,11 +199,11 @@ def plot_output(G: nx.Graph,
 
     sgids = indicator_to_assignment(X, axis=1)
 
-    print('=' * 64)
-    print('# nodes: ', l)
-    print('# subgraphs:', m)
-    print('cluster id for nodes in ', name)
-    print(sgids)
+    # print('=' * 64)
+    # print('# nodes: ', l)
+    # print('# subgraphs:', m)
+    # print('cluster id for nodes in ', name)
+    # print(sgids)
 
     fig = plt.figure(figsize=(10, 10))
     ax = plt.axes()
@@ -136,95 +224,98 @@ def plot_output(G: nx.Graph,
 
 
 if __name__ == "__main__":
-    FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
-    logging.basicConfig(format=FORMAT, level=logging.INFO)
+    # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+    # logging.basicConfig(format=FORMAT, level=logging.INFO)
     np.set_printoptions(edgeitems=30, linewidth=200)
 
     Gs = load_graphs()
-
     module_indices = get_module_index(Gs)
 
-    # init inputs for ParMe
-    n = len(Gs); r = len(module_indices)
-    Ls = []; R0s = []
-    w0 = np.ones(r)
-    q = np.asarray([1, 1, 1, 1])
-    t = 2; theta = 0.2
-    min_size = 8
-    max_size = 16
+    # parse arguments
+    parser = get_argparser()
+    args = parser.parse_args()
+
+    # calculate parameters from args
+    parameters = get_parameters(args, Gs, module_indices)
+    (t, theta, w0, q, max_size, min_size, time, rho_star, phi_star) = parameters
+
     # update inputs for ParMe
+    print('=' * 64)
+    print('reading input graphs')
+    Ls = []; R0s = []
     for name in Gs:
         G = Gs[name]
         L = nx.laplacian_matrix(G).tocoo()
         Ls.append(L)
         R0 = get_R0(G, module_indices)
         R0s.append(R0)
-
-        print("=" * 64)
         print(name)
-        print(R0.shape)
-        # print(R0)
-
         plot_input(G, name)
+    
+    # build Gurobi model
+    model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s,
+                                                 w0=w0, t=t, theta=theta,
+                                                 min_size=min_size,
+                                                 max_size=max_size,
+                                                 rho_star=rho_star,
+                                                 phi_star=phi_star)
+    # update model and Gurobi configuration
+    model.update()
+    model.setParam("LogFile", log_file)
+    model.setParam("LogToConsole", 0)
+    model.setParam('TimeLimit', time * 60)
 
+    model.optimize()
 
-    for theta in np.linspace(0.0, 0.9, 10):
-        print("=" * 64)
-        print('theta =', theta)
-        model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s, w0=w0, t=t,
-                                                     min_size=min_size, max_size=max_size,
-                                                     theta=theta)
-        # update model and Gurobi configuration
-        model.update()
-        model.setParam("LogFile", log_file)
-        model.setParam("LogToConsole", 0)
-        model.setParam('TimeLimit', 30 * 60)
+    if (model.status == GRB.OPTIMAL or
+        model.status == GRB.TIME_LIMIT or
+        model.status == GRB.NODE_LIMIT or
+        model.status == GRB.ITERATION_LIMIT or
+        model.status == GRB.USER_OBJ_LIMIT):
+        # get a solution
+        if model.status == GRB.TIME_LIMIT:
+            print("[GRB] reach time limit")
+        if model.status == GRB.OPTIMAL:
+            print("[GRB] get optimal")
+        
+        if model.SolCount > 1:
 
-        model.optimize()
+            (Xs, Zs, R_sup, Rs) = grb_vars
+            (rho, phi) = grb_exprs
 
-        if (model.status == GRB.OPTIMAL or
-            model.status == GRB.TIME_LIMIT or
-            model.status == GRB.NODE_LIMIT or
-            model.status == GRB.ITERATION_LIMIT or
-            model.status == GRB.USER_OBJ_LIMIT):
-            # get a solution
-            if model.status == GRB.TIME_LIMIT:
-                print("time limit")
-            if model.status == GRB.OPTIMAL:
-                print("get optimal")
-            
+            print("rho_tilde:", rho.getValue())
+            print("phi_tilde:", phi.getValue())
 
-            if model.SolCount > 1:
+            np_Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
+            np_Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+            np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
+            np_R_sup = grb_vars_to_ndarray(R_sup)
 
-                (Xs, Zs, R_sup, Rs) = grb_vars
-                (rho, phi) = grb_exprs
+            # generate output figures
+            for i, name in enumerate(Gs):
+                # print(i, name)
+                G = Gs[name]
+                np_X = np_Xs[i]
+                fig_name = "{}:t={:02d}:theta={:.03f}".format(
+                    name, t, theta
+                )
+                plot_output(G, np_X, fig_name)
 
-                print("rho:", rho.getValue())
-                print("phi:", phi.getValue())
+            # # check the optimality of R_sup
+            # R_cat = np.concatenate(Rs, axis=-1)
+            # Z_cat = np.concatenate(Zs, axis=-1)
+            # print(R_cat.shape)
+            # print(Z_cat.shape)
+            # R_max = get_R_max(R_cat, Z_cat)
+            # print(np.sum((R_max - R_sup) ** 2))
+            # print(R_sup)
 
-                np_Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-                np_Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
-                np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
-                np_R_sup = grb_vars_to_ndarray(R_sup)
-
-                # generate output figures
-                for i, name in enumerate(Gs):
-                    print(i, name)
-                    G = Gs[name]
-                    np_X = np_Xs[i]
-                    fig_name = "{}:t={:02d}:theta={:.03f}".format(
-                        name, t, theta
-                    )
-                    plot_output(G, np_X, fig_name)
-
-                # # check the optimality of R_sup
-                # R_cat = np.concatenate(Rs, axis=-1)
-                # Z_cat = np.concatenate(Zs, axis=-1)
-                # print(R_cat.shape)
-                # print(Z_cat.shape)
-                # R_max = get_R_max(R_cat, Z_cat)
-                # print(np.sum((R_max - R_sup) ** 2))
-                # print(R_sup)
-            
-            else:
-                print('No feasible solution found')
+            exit(0)
+        else:
+            print('[GRB] no feasible solution found')
+    elif (model.status == GRB.INFEASIBLE):
+        print('[GRB] proved to be infeasible')
+    elif (model.status == GRB.UNBOUNDED):
+        print('[GRB] proved to be unbounded')
+    else:
+        print('[GRB] return code ', model.status)
