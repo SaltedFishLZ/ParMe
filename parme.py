@@ -94,7 +94,10 @@ def get_parme_model(
     # iter over each input G and update variables, constrs, and obj
     for i in range(n):
         X = Xs[i]; R0 = R0s[i]
-        l, m = grb_vars_shape(X); assert l_ == l, ValueError()
+        l, m = grb_vars_shape(X)
+        r_, l_ = R0.shape
+        assert l_ == l, ValueError()
+        assert r_ == r, ValueError()
         # connection equation as constraints:
         # R = R0 X
         R = model.addVars(r, m, name="R")
