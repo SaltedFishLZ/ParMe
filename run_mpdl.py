@@ -198,6 +198,7 @@ def plot_output(G: nx.Graph,
     assert l_ == l, ValueError('Shape mismatch')
 
     sgids = indicator_to_assignment(X, axis=1)
+    print(sgids)
 
     # print('=' * 64)
     # print('# nodes: ', l)
@@ -213,7 +214,7 @@ def plot_output(G: nx.Graph,
     
     nx.draw_networkx(G, ax=ax, pos=pos,
                      node_color=sgids,
-                     cmap=plt.cm.magma, 
+                     cmap=plt.cm.viridis, 
                      with_labels=False)
 
     dir_path = os.path.join('figures', 'mpdl')
@@ -259,6 +260,8 @@ if __name__ == "__main__":
                                                  max_size=max_size,
                                                  rho_star=rho_star,
                                                  phi_star=phi_star)
+    # print(model.printStats())
+    # exit(0)
     # update model and Gurobi configuration
     model.update()
     model.setParam("LogFile", log_file)
@@ -286,8 +289,8 @@ if __name__ == "__main__":
             print("rho_tilde:", rho.getValue())
             print("phi_tilde:", phi.getValue())
 
-            np_Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-            np_Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+            np_Xs = [np.rint(grb_vars_to_ndarray(X)).astype(int) for X in Xs]
+            np_Zs = [np.rint(grb_vars_to_ndarray(Z)).astype(int) for Z in Zs]    
             np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
             np_R_sup = grb_vars_to_ndarray(R_sup)
 
@@ -296,6 +299,11 @@ if __name__ == "__main__":
                 # print(i, name)
                 G = Gs[name]
                 np_X = np_Xs[i]
+                
+                print(name)
+                print(np_X)
+                print(np_Rs[i])
+
                 fig_name = "{}:t={:02d}:theta={:.03f}".format(
                     name, t, theta
                 )
