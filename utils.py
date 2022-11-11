@@ -5,7 +5,6 @@ __all__ = [
     "assignment_to_cluster",
     "indicator_to_cluster",
     "sorted_assignment",
-    "get_R_max"
 ]
 
 import numpy as np
@@ -127,17 +126,3 @@ def sorted_assignment(a: np.ndarray,
     else:
         return a_sorted
 
-def get_R_max(R: np.ndarray,
-              Z: np.ndarray):
-    """
-    :paran R: size $r \times m$
-    :param Z: size $t \times m$
-    :return: R_max ($t \times m$), $\overline{R}$ by using max function
-    """
-    assert isinstance(R, np.ndarray), NotImplementedError()
-    assert isinstance(Z, np.ndarray), NotImplementedError()
-    r, m = R.shape; t, m_ = Z.shape
-    assert m_ == m, ValueError("Size mismatch")
-    # use einsum without reduction
-    R_max = np.max(np.einsum('ij,kj->ikj', R, Z), axis=-1)
-    return R_max

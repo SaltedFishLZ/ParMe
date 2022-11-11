@@ -320,6 +320,17 @@ if __name__ == "__main__":
             # print(np.sum((R_max - R_sup) ** 2))
             # print(R_sup)
 
+            import eval
+            print('eval rho by nx', eval.get_rho_nx(np_Xs, Gs, q))
+            print('eval rho by np', eval.get_rho(Xs=np_Xs, Ls=Ls, q=q))
+
+            n = len(Xs)
+            for i in range(n):
+                R0 = R0s[i]
+                X = np_Xs[i]
+                w = w0.T @ R0
+                print(eval.get_subG_size(X, w))
+
             exit(0)
         else:
             print('[GRB] no feasible solution found')
