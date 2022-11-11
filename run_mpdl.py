@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import json
 import pickle
 import logging
 import calendar
@@ -34,13 +35,15 @@ from parme import get_parme_model
 # Global Gurobi setting
 current_GMT = time.gmtime()
 timestamp = calendar.timegm(current_GMT)
-log_file = "gurobi.ParMe.{}.log".format(timestamp)
+log_file = "gurobi.{}.log".format(timestamp)
 
 
 def get_argparser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description='ParMe experiment parser.'
     )
+    parser.add_argument('--output', '-o', type=str, required=True,
+                        help='output directory')
     parser.add_argument('--t', '-t',
                         type=int, default=1,
                         help='number of templates')
@@ -108,18 +111,29 @@ def get_parameters(args, Gs, module_indices, echo=True):
     phi_star = args.phi_star
     assert phi_star > 1e-20, ValueError()
 
+    config = {
+        'output' : args.output,
+        't' : t, 'theta' : theta,
+        'w0' : w0.tolist(), 'q' : q.tolist(),
+        'max_size' : max_size,
+        'min_size' : min_size,
+        'time' : time,
+        'rho_star' : rho_star,
+        'phi_star' : phi_star
+    }
+
     if echo:
-        print('[n]', n); print('[r]', r)
-        print('[module/resource index]', module_indices)
-        print('[t]', t)
-        print('[theta]', theta)
-        print('[w0]', w0)
-        print('[q]', q)
-        print('[max size]', max_size)
-        print('[min size]', min_size)
-        print('[time]', time)
-        print('[rho_star]', rho_star)
-        print('[phi_star]', phi_star)
+        print("\n".join("{}: {}".format(k + ' ' * (32 - len(k)), v)
+                        for k, v in config.items()))
+
+    # dump config to json
+    os.makedirs(args.output, exist_ok=True)
+    with open(os.path.join(args.output, 'config.json'), 'w') as fp:
+        json.dump(config, fp, indent=4)
+
+    # set gurobi log
+    global log_file
+    log_file = os.path.join(args.output, log_file)
 
     return (t, theta, w0, q, max_size, min_size, time, rho_star, phi_star)
 
@@ -168,7 +182,10 @@ def get_R0(G: nx.Graph,
     return R0
 
 
-def plot_input(G, name):
+def plot_input(G: nx.Graph,
+               out_dir: str,
+               name: str) -> None:
+
     fig = plt.figure(figsize=(10, 10))
     ax = plt.axes()
 
@@ -179,16 +196,17 @@ def plot_input(G, name):
                 pos=pos,
                 node_color_keyword="module")
 
-    dir_path = os.path.join('figures', 'mpdl')
-    os.makedirs(dir_path, exist_ok=True)
-    png_path = os.path.join(dir_path, '{}.png'.format(name))
-    plt.savefig(png_path)
+    os.makedirs(out_dir, exist_ok=True)
+    plt.savefig(os.path.join(out_dir, 'input.{}.png'.format(name)))
+    plt.savefig(os.path.join(out_dir, 'input.{}.pdf'.format(name)))
+
     plt.clf(); plt.cla(); plt.close()
 
 
 def plot_output(G: nx.Graph,
                 X: np.ndarray,
-                name: str):
+                out_dir: str,
+                name: str) -> None:
     """
     :param G:
     :param X: $l \times m$
@@ -216,10 +234,10 @@ def plot_output(G: nx.Graph,
                      cmap=plt.cm.magma, 
                      with_labels=False)
 
-    dir_path = os.path.join('figures', 'mpdl')
-    os.makedirs(dir_path, exist_ok=True)
-    png_path = os.path.join(dir_path, '{}.png'.format(name))
-    plt.savefig(png_path)
+    os.makedirs(out_dir, exist_ok=True)
+    plt.savefig(os.path.join(out_dir, 'output.{}.png'.format(name)))
+    plt.savefig(os.path.join(out_dir, 'output.{}.pdf'.format(name)))
+
     plt.clf(); plt.cla(); plt.close()
 
 
@@ -250,7 +268,8 @@ if __name__ == "__main__":
         R0 = get_R0(G, module_indices)
         R0s.append(R0)
         print(name)
-        plot_input(G, name)
+        plot_input(G=G, out_dir=args.output, name=name)
+    print('=' * 64)
     
     # build Gurobi model
     model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s,
@@ -267,6 +286,9 @@ if __name__ == "__main__":
 
     model.optimize()
 
+    # obtain GRB status
+    grbret = {'status' : model.status,}
+    
     if (model.status == GRB.OPTIMAL or
         model.status == GRB.TIME_LIMIT or
         model.status == GRB.NODE_LIMIT or
@@ -278,49 +300,49 @@ if __name__ == "__main__":
         if model.status == GRB.OPTIMAL:
             print("[GRB] get optimal")
         
+        grbret['solcount'] = model.SolCount
+
         if model.SolCount > 1:
+            grbret['bestobj'] = model.getObjective().getValue()
 
             (Xs, Zs, R_sup, Rs) = grb_vars
             (rho, phi) = grb_exprs
 
-            print("rho_tilde:", rho.getValue())
-            print("phi_tilde:", phi.getValue())
+            grbret['rho_tilde'] = rho.getValue()
+            grbret['phi_tilde'] = phi.getValue()
+            grbret['rho'] = grbret['rho_tilde'] * rho_star
+            grbret['phi'] = grbret['phi_tilde'] * phi_star
 
-            np_Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
-            np_Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
-            np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
-            np_R_sup = grb_vars_to_ndarray(R_sup)
+            Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
+            Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
+            Rs = [grb_vars_to_ndarray(R) for R in Rs]
+            R_sup = grb_vars_to_ndarray(R_sup)
 
             # sort X assignment, re-arrange subgraph id
-            for i in range(len(np_Xs)):
+            for i in range(len(Xs)):
                 # X: l \times m, assignee is subgraph index
-                np_Xs[i] = np_Xs[i].T
-                np_Xs[i], index = sorted_assignment(np_Xs[i], axis=0, with_index=True)
-                np_Xs[i] = np_Xs[i].T
-                np_Zs[i] = np_Zs[i][:, index]
-                np_Rs[i] = np_Rs[i][:, index]
-
+                Xs[i] = Xs[i].T
+                Xs[i], index = sorted_assignment(Xs[i], axis=0, with_index=True)
+                Xs[i] = Xs[i].T
+                Zs[i] = Zs[i][:, index]
+                Rs[i] = Rs[i][:, index]
 
             # generate output figures
             for i, name in enumerate(Gs):
                 # print(i, name)
                 G = Gs[name]
-                np_X = np_Xs[i]
-                fig_name = "{}:t={:02d}:theta={:.03f}".format(
-                    name, t, theta
-                )
-                plot_output(G, np_X, fig_name)
-
-            # # check the optimality of R_sup
-            # R_cat = np.concatenate(Rs, axis=-1)
-            # Z_cat = np.concatenate(Zs, axis=-1)
-            # print(R_cat.shape)
-            # print(Z_cat.shape)
-            # R_max = get_R_max(R_cat, Z_cat)
-            # print(np.sum((R_max - R_sup) ** 2))
-            # print(R_sup)
-
-            exit(0)
+                X = Xs[i]
+                plot_output(G=G, X=X, out_dir=args.output, name=name)
+            
+            # dump np results to pickle files
+            with open(os.path.join(args.output, 'Xs.pkl'), 'wb') as file:
+                pickle.dump(Xs, file)
+            with open(os.path.join(args.output, 'Zs.pkl'), 'wb') as file:
+                pickle.dump(Zs, file)
+            with open(os.path.join(args.output, 'Rs.pkl'), 'wb') as file:
+                pickle.dump(Rs, file)
+            with open(os.path.join(args.output, 'R_sup.pkl'), 'wb') as file:
+                pickle.dump(R_sup, file)
         else:
             print('[GRB] no feasible solution found')
     elif (model.status == GRB.INFEASIBLE):
@@ -329,3 +351,13 @@ if __name__ == "__main__":
         print('[GRB] proved to be unbounded')
     else:
         print('[GRB] return code ', model.status)
+
+    # optimization status
+    print('=' * 64)
+    print("\n".join("{}: {}".format(k + ' ' * (32 - len(k)), v)
+                    for k, v in grbret.items()))
+
+    # dump config to json
+    os.makedirs(args.output, exist_ok=True)
+    with open(os.path.join(args.output, 'grbret.json'), 'w') as fp:
+        json.dump(grbret, fp, indent=4)
