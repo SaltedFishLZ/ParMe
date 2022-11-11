@@ -291,6 +291,16 @@ if __name__ == "__main__":
             np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
             np_R_sup = grb_vars_to_ndarray(R_sup)
 
+            # sort X assignment, re-arrange subgraph id
+            for i in range(len(np_Xs)):
+                # X: l \times m, assignee is subgraph index
+                np_Xs[i] = np_Xs[i].T
+                np_Xs[i], index = sorted_assignment(np_Xs[i], axis=0, with_index=True)
+                np_Xs[i] = np_Xs[i].T
+                np_Zs[i] = np_Zs[i][:, index]
+                np_Rs[i] = np_Rs[i][:, index]
+
+
             # generate output figures
             for i, name in enumerate(Gs):
                 # print(i, name)
