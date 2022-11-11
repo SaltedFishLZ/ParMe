@@ -173,7 +173,7 @@ if __name__ == "__main__":
     #     model.status == GRB.ITERATION_LIMIT or
     #     model.status == GRB.USER_OBJ_LIMIT):
     #     # get a solution
-    #     X = grb_vars_to_ndarray(X).astype(int)
+    #     X = grb_vars_to_ndarray(X, dtype=int)
     #     print(X)
     #     if model.status == GRB.TIME_LIMIT:
     #         print("time limit")
@@ -230,5 +230,5 @@ if __name__ == "__main__":
             print("get optimal")
         # print solution
             for X in Xs:
-                X = grb_vars_to_ndarray(X).astype(int)
+                X = grb_vars_to_ndarray(X, dtype=int)
                 print(X)

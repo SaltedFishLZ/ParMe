@@ -286,8 +286,8 @@ if __name__ == "__main__":
             print("rho_tilde:", rho.getValue())
             print("phi_tilde:", phi.getValue())
 
-            np_Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-            np_Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+            np_Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
+            np_Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
             np_Rs = [grb_vars_to_ndarray(R) for R in Rs]
             np_R_sup = grb_vars_to_ndarray(R_sup)
 

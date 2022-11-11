@@ -217,7 +217,7 @@ if __name__ == "__main__":
     # Optimize
     model.optimize()
 
-    Z0 = grb_vars_to_ndarray(Z).astype(int)
+    Z0 = grb_vars_to_ndarray(Z, dtype=int)
     R_sup0 = grb_vars_to_ndarray(R_sup)
     print(Z0)
     print(R_sup0)
@@ -239,7 +239,7 @@ if __name__ == "__main__":
     model.setParam('TimeLimit', 20 * 60)
 
     model.optimize()
-    Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]
+    Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]
     Z1 = np.concatenate(Zs, axis=1)
     R_sup1 = grb_vars_to_ndarray(R_sup)
     print(Z1)

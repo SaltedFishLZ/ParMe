@@ -34,8 +34,9 @@ def grb_vars_shape(vars:gp.tupledict) -> tuple:
     return tuple(shape)
 
 
-def grb_vars_to_ndarray(vars:gp.tupledict,
-                        shape:tuple=None) -> np.ndarray:
+def grb_vars_to_ndarray(vars: gp.tupledict,
+                        shape: tuple = None,
+                        dtype: type = float) -> np.ndarray:
     """Convert a multi-dimensional Gurobi Vars to a numpy ndarray
     :param model:
     :param vars:
@@ -47,10 +48,16 @@ def grb_vars_to_ndarray(vars:gp.tupledict,
         shape = grb_vars_shape(vars)
 
     # fill in values
-    array = np.zeros(shape)
+    array = np.zeros(shape, dtype=dtype)
     for coord in vars:
         var = vars[coord]
-        array[coord] = var.X
+        val = var.X
+        if dtype == int:
+            array[coord] = np.rint(val)
+        elif dtype == float:
+            array[coord] = float(val)
+        else:
+            raise NotImplementedError()
 
     return array
 
