@@ -215,8 +215,8 @@ if __name__ == "__main__":
     (Xs, Zs, R_sup, Rs) = grb_vars
     (rho, phi) = grb_exprs
 
-    Xs = [grb_vars_to_ndarray(X).astype(int) for X in Xs]
-    Zs = [grb_vars_to_ndarray(Z).astype(int) for Z in Zs]    
+    Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
+    Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
     Rs = [grb_vars_to_ndarray(R) for R in Rs]
     R_sup = grb_vars_to_ndarray(R_sup)
 
