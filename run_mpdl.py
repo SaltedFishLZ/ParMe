@@ -162,6 +162,12 @@ if __name__ == "__main__":
     parameters = utils.get_parameters(args, n=len(Gs), r=len(module_indices))
     config = parameters
 
+    # write config json file
+    os.makedirs(args.output, exist_ok=True)
+    jstring = utils.dict_to_json(config)
+    with open(os.path.join(args.output, 'config.json'), 'w') as fp:
+        fp.write(jstring)
+
     # update inputs for ParMe
     print('=' * 64)
     print('reading input graphs')
@@ -263,7 +269,8 @@ if __name__ == "__main__":
     print("\n".join("{}: {}".format(k + ' ' * (32 - len(k)), v)
                     for k, v in grbret.items()))
 
-    # dump config to json
+    # dump Gurobi return to json
     os.makedirs(args.output, exist_ok=True)
     with open(os.path.join(args.output, 'grbret.json'), 'w') as fp:
         json.dump(grbret, fp, indent=4)
+

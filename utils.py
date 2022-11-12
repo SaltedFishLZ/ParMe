@@ -72,6 +72,10 @@ def grb_vars_to_ndarray(vars: gp.tupledict,
     return array
 
 
+# ---------------------------------------------------------------- #
+#                    results processing                            #
+# ---------------------------------------------------------------- #
+
 def onehot_to_index(onehot: np.ndarray,
                  axis: int = 1) -> np.ndarray:
     """Convert one-hot assignment tensor to a tensor of assignee ids
@@ -151,6 +155,7 @@ def sorted_assignment(a: np.ndarray,
     else:
         return a_sorted
 
+
 def get_R_max(R: np.ndarray,
               Z: np.ndarray):
     """
@@ -166,6 +171,10 @@ def get_R_max(R: np.ndarray,
     R_max = np.max(np.einsum('ij,kj->ikj', R, Z), axis=-1)
     return R_max
 
+
+# ---------------------------------------------------------------- #
+#                   input/output/save/load                         #
+# ---------------------------------------------------------------- #
 
 def dump_pickle_results(out_dir: str, Xs, Zs, Rs, R_sup):
     with open(os.path.join(out_dir, 'Xs.pkl'), 'wb') as file:
@@ -206,6 +215,20 @@ def dump_text_results(out_dir: str, Xs, Zs, Rs, R_sup):
                    R, fmt='%d')
     np.savetxt(os.path.join(out_dir, 'R_sup.txt'),
                R_sup, fmt='%d')
+
+
+def dict_to_json(d: dict):
+    jsonable = copy.deepcopy(d)
+    # convert unjsonbale objects
+    for key in jsonable:
+        val = jsonable[key]
+        # deal with ndarray values
+        if isinstance(val, np.ndarray):            
+            # NOTE: please use d[key] to modify
+            # the content of a dictionary record
+            jsonable[key] = val.tolist()
+    json_object = json.dumps(jsonable, indent=4)
+    return json_object 
 
 
 def dump_json_results():
@@ -252,7 +275,7 @@ def get_argparser(name='experiment parser') -> argparse.ArgumentParser:
     return parser
 
 
-def get_parameters(args, n, r, echo=True):
+def get_parameters(args, n, r, echo=False):
     """obtain ParMe configs from args and make basic sanity checks
     """
     t = args.t
@@ -313,11 +336,7 @@ def get_parameters(args, n, r, echo=True):
             # NOTE: please use dict[key] to modify
             # the content of a dictionary record
             jsonable_config[key] = val.tolist()
-
-    os.makedirs(args.output, exist_ok=True)
-    with open(os.path.join(args.output, 'config.json'), 'w') as fp:
-        json.dump(jsonable_config, fp, indent=4)
-
+        
     return config
 
 
