@@ -60,7 +60,7 @@ def get_parme_model(
     Rs = []
     # init merge objectives and variables
     phi = 0.0; Zs = []
-    R_sup = model.addVars(r, t, name="R_sup")
+    R_sup = model.addVars(r, t, name="R_sup", lb=0.0)
 
     # -------------------------------- #
     #         Partition Part           #
@@ -73,7 +73,7 @@ def get_parme_model(
         # w = w0^T R0 (w is a constant for each G)
         w = w0.T @ R0
         # get m subgraphs
-        m = int(np.floor(l / min_size))
+        m = int(np.floor(w.sum() / min_size))
         m = min(l, m)
         print("m = ", m)
         # set variables
@@ -102,23 +102,45 @@ def get_parme_model(
         assert r_ == r, ValueError()
         # connection equation as constraints:
         # R = R0 X
-        R = model.addVars(r, m, name="R")
+        R = model.addVars(r, m, name="R", lb=0.0)
         Rs.append(R)
         model.addConstrs(R[i, j] == gp.quicksum(R0[i, k] * X[k, j] for k in range(l))
                          for i in range(r)
                          for j in range(m))
-        # set variables
+        # assignment variables
         Z = model.addVars(t, m, name="Z", vtype=GRB.BINARY)
         Zs.append(Z)
+        # inverse yield (Y^-1) varibales
+        # since 0 <y <= 1, inv_y >= 1
+        inv_yield = model.addVars(t, name="inverse yield", lb=1.0)
+        # s: area for each template, a list
+        # s = model.addVars(t, name="template area")
+        s = [gp.quicksum(w0[i] * R_sup[i, j] for i in range(r)) for j in range(t)]
+        # template cost
+        phi_template = model.addVars(t, name="template cost", lb=0.0)
+
+        # q_sup: aggregated product volumes for each template
+        q_sup = [ gp.quicksum(Z[k, j] for j in range(m))
+                  for k in range(t) ] # template k in [t]
+
         # set constraints
         merge_constrs = get_merge_constraints(R_sup=R_sup, Z=Z, R=R)
         for constrs in merge_constrs:
             model.addConstrs(merge_constrs[constrs], name=constrs)
-        # update objective
-        phi_i = get_merge_objective(R_sup=R_sup, Z=Z,
-                                    # subgraphs in G^(i) are equally weighted
-                                    q=np.ones(m),
-                                    w0=w0)
+        
+        # yield constraits
+        alpha = 10
+        d0 = 0.001
+        model.addConstrs(inv_yield[k] >=
+                         1 + d0 * s[k] +
+                        (alpha - 1) / (2 * alpha) * (d0 ** 2) * (s[k] ** 2)
+                         for k in range(t))
+
+        # template cost equation
+        model.addConstrs(phi_template[k] >= s[k] * inv_yield[k] for k in range(t))
+
+        phi_i = gp.quicksum(phi_template[k] * q_sup[k] for k in range(t))
+
         phi += q[i] * phi_i
 
     # normalize 2 objectives
@@ -129,6 +151,8 @@ def get_parme_model(
     objective = theta * rho_tilde + (1 - theta) * phi_tilde
     model.setObjective(objective)
     model.update()
+
+    model.setParam('NonConvex', 2)
 
     return model, (Xs, Zs, R_sup, Rs), (rho_tilde, phi_tilde)
 
