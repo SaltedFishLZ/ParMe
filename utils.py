@@ -5,8 +5,16 @@ __all__ = [
     "assignment_to_cluster",
     "indicator_to_cluster",
     "sorted_assignment",
-    "get_R_max"
+    "get_R_max",
+    'dump_pickle_results',
+    'load_pickle_results'
 ]
+
+import os
+import sys
+import time
+import json
+import pickle
 
 import numpy as np
 import gurobipy as gp
@@ -141,3 +149,48 @@ def get_R_max(R: np.ndarray,
     # use einsum without reduction
     R_max = np.max(np.einsum('ij,kj->ikj', R, Z), axis=-1)
     return R_max
+
+
+def dump_pickle_results(out_dir: str, Xs, Zs, Rs, R_sup):
+    with open(os.path.join(out_dir, 'Xs.pkl'), 'wb') as file:
+        pickle.dump(Xs, file)
+    with open(os.path.join(out_dir, 'Zs.pkl'), 'wb') as file:
+        pickle.dump(Zs, file)
+    with open(os.path.join(out_dir, 'Rs.pkl'), 'wb') as file:
+        pickle.dump(Rs, file)
+    with open(os.path.join(out_dir, 'R_sup.pkl'), 'wb') as file:
+        pickle.dump(R_sup, file)
+
+
+def load_pickle_results(out_dir: str):
+    with open(os.path.join(out_dir, 'Xs.pkl'), 'rb') as file:
+        Xs = pickle.load(file)
+    with open(os.path.join(out_dir, 'Zs.pkl'), 'rb') as file:
+        Zs = pickle.load(file)
+    with open(os.path.join(out_dir, 'Rs.pkl'), 'rb') as file:
+        Rs = pickle.load(file)
+    with open(os.path.join(out_dir, 'R_sup.pkl'), 'rb') as file:
+        R_sup = pickle.load(file)
+    
+    return (Xs, Zs, Rs, R_sup)
+
+
+def dump_text_results(out_dir: str, Xs, Zs, Rs, R_sup):
+    """
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    for i, X in enumerate(Xs):
+        np.savetxt(os.path.join(out_dir, 'X-{}.txt'.format(i)),
+                   X, fmt='%d')
+    for i, Z in enumerate(Zs):
+        np.savetxt(os.path.join(out_dir, 'Z-{}.txt'.format(i)),
+                   Z, fmt='%d')
+    for i, R in enumerate(Rs):
+        np.savetxt(os.path.join(out_dir, 'R-{}.txt'.format(i)) ,
+                   R, fmt='%d')
+    np.savetxt(os.path.join(out_dir, 'R_sup.txt'),
+               R_sup, fmt='%d')
+
+
+def dump_json_results():
+    pass

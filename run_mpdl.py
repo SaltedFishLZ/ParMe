@@ -29,6 +29,7 @@ import EleNetX.mpdl as mpdl
 from EleNetX.utils import obj_attr_cat_to_int
 from EleNetX.visualize import plot_ele_nx
 
+import utils
 from utils import *
 from parme import get_parme_model
 
@@ -315,8 +316,8 @@ if __name__ == "__main__":
 
             Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
             Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
-            Rs = [grb_vars_to_ndarray(R) for R in Rs]
-            R_sup = grb_vars_to_ndarray(R_sup)
+            Rs = [grb_vars_to_ndarray(R, dtype=int) for R in Rs]
+            R_sup = grb_vars_to_ndarray(R_sup, dtype=int)
 
             # sort X assignment, re-arrange subgraph id
             for i in range(len(Xs)):
@@ -335,14 +336,12 @@ if __name__ == "__main__":
                 plot_output(G=G, X=X, out_dir=args.output, name=name)
             
             # dump np results to pickle files
-            with open(os.path.join(args.output, 'Xs.pkl'), 'wb') as file:
-                pickle.dump(Xs, file)
-            with open(os.path.join(args.output, 'Zs.pkl'), 'wb') as file:
-                pickle.dump(Zs, file)
-            with open(os.path.join(args.output, 'Rs.pkl'), 'wb') as file:
-                pickle.dump(Rs, file)
-            with open(os.path.join(args.output, 'R_sup.pkl'), 'wb') as file:
-                pickle.dump(R_sup, file)
+            utils.dump_pickle_results(out_dir=args.output,
+                                      Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
+            # dump np results to text files
+            utils.dump_text_results(out_dir=args.output,
+                                      Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
+
         else:
             print('[GRB] no feasible solution found')
     elif (model.status == GRB.INFEASIBLE):
