@@ -30,113 +30,13 @@ from EleNetX.utils import obj_attr_cat_to_int
 from EleNetX.visualize import plot_ele_nx
 
 import utils
-from utils import *
+# from utils import *
 from parme import get_parme_model
 
 # Global Gurobi setting
 current_GMT = time.gmtime()
 timestamp = calendar.timegm(current_GMT)
 log_file = "gurobi.{}.log".format(timestamp)
-
-
-def get_argparser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description='ParMe experiment parser.'
-    )
-    parser.add_argument('--output', '-o', type=str, required=True,
-                        help='output directory')
-    parser.add_argument('--t', '-t',
-                        type=int, default=1,
-                        help='number of templates')
-    parser.add_argument('--theta', metavar='[0, 1]',
-                        type=float, default=0.0,
-                        help='weight for the cut size objective')
-    parser.add_argument('--max-size',
-                        type=float, required=True,
-                        help='max size of each subgraph')
-    parser.add_argument('--min-size',
-                        type=float, required=True,
-                        help='min size of each subgraph')
-    parser.add_argument('--w0', metavar='%f', nargs='+',
-                        type=float, default=None, 
-                        help='node weights for each type of resource')
-    parser.add_argument('--q', '-q', metavar='%f', nargs='+',
-                        type=float, default=None, 
-                        help='quantity weight for each G')
-    parser.add_argument('--time', metavar='TIME',
-                        type=float, default=5,
-                        help='run time limit (min) for each optimization')
-    parser.add_argument('--rho-star', metavar='rho*',
-                        type=float, default=1.,
-                        help='precalculated rho* used to scale rho')
-    parser.add_argument('--phi-star', metavar='phi*',
-                        type=float, default=1.,
-                        help='precalculated phi* used to scale phi')
-    return parser
-
-
-def get_parameters(args, Gs, module_indices, echo=True):
-    """parse ParMe parameters and make sanity check
-    """
-    n = len(Gs); r = len(module_indices)
-    
-    t = args.t
-    assert t > 0, ValueError()
-
-    theta = args.theta
-    assert theta >= 0.0,  ValueError()
-    assert theta <= 1.0, ValueError()
-    
-    if args.w0 is None:
-        w0 = np.ones(r)
-    else:
-        w0 = np.asarray(args.w0)
-        assert len(w0) == r, ValueError()
-    
-    if args.q is None:
-        q = np.ones(n)
-    else:
-        q = np.asarray(args.q)
-        assert len(q) == n, ValueError()
-    
-    max_size = args.max_size
-    min_size = args.min_size
-    assert max_size > min_size, ValueError()
-
-    time = args.time
-    assert time > 0., ValueError()
-
-    rho_star = args.rho_star
-    assert rho_star > 1e-20, ValueError()
-
-    phi_star = args.phi_star
-    assert phi_star > 1e-20, ValueError()
-
-    config = {
-        'output' : args.output,
-        't' : t, 'theta' : theta,
-        'w0' : w0.tolist(), 'q' : q.tolist(),
-        'max_size' : max_size,
-        'min_size' : min_size,
-        'time' : time,
-        'rho_star' : rho_star,
-        'phi_star' : phi_star
-    }
-
-    if echo:
-        print("\n".join("{}: {}".format(k + ' ' * (32 - len(k)), v)
-                        for k, v in config.items()))
-
-    # dump config to json
-    os.makedirs(args.output, exist_ok=True)
-    with open(os.path.join(args.output, 'config.json'), 'w') as fp:
-        json.dump(config, fp, indent=4)
-
-    # set gurobi log
-    global log_file
-    log_file = os.path.join(args.output, log_file)
-
-    return (t, theta, w0, q, max_size, min_size, time, rho_star, phi_star)
 
 
 def load_graphs() -> Dict[str, nx.Graph]:
@@ -216,7 +116,7 @@ def plot_output(G: nx.Graph,
     l_, m = X.shape
     assert l_ == l, ValueError('Shape mismatch')
 
-    sgids = indicator_to_assignment(X, axis=1)
+    sgids = utils.onehot_to_index(X, axis=1)
 
     # print('=' * 64)
     # print('# nodes: ', l)
@@ -233,7 +133,7 @@ def plot_output(G: nx.Graph,
     nx.draw_networkx(G, ax=ax, pos=pos,
                      node_color=sgids,
                      cmap=plt.cm.magma, 
-                     with_labels=False)
+                     with_labels=True)
 
     os.makedirs(out_dir, exist_ok=True)
     plt.savefig(os.path.join(out_dir, 'output.{}.png'.format(name)))
@@ -251,12 +151,16 @@ if __name__ == "__main__":
     module_indices = get_module_index(Gs)
 
     # parse arguments
-    parser = get_argparser()
+    parser = utils.get_argparser()
     args = parser.parse_args()
 
+    # set gurobi log
+    # global log_file
+    log_file = os.path.join(args.output, log_file)
+
     # calculate parameters from args
-    parameters = get_parameters(args, Gs, module_indices)
-    (t, theta, w0, q, max_size, min_size, time, rho_star, phi_star) = parameters
+    parameters = utils.get_parameters(args, n=len(Gs), r=len(module_indices))
+    config = parameters
 
     # update inputs for ParMe
     print('=' * 64)
@@ -273,17 +177,20 @@ if __name__ == "__main__":
     print('=' * 64)
     
     # build Gurobi model
-    model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, q=q, R0s=R0s,
-                                                 w0=w0, t=t, theta=theta,
-                                                 min_size=min_size,
-                                                 max_size=max_size,
-                                                 rho_star=rho_star,
-                                                 phi_star=phi_star)
+    model, grb_vars, grb_exprs = get_parme_model(Ls=Ls, R0s=R0s,
+                                                 q=config['q'],
+                                                 w0=config['w0'],
+                                                 t=config['t'],
+                                                 theta=config['theta'],
+                                                 min_size=config['min_size'],
+                                                 max_size=config['max_size'],
+                                                 rho_star=config['rho_star'],
+                                                 phi_star=config['phi_star'])
     # update model and Gurobi configuration
     model.update()
     model.setParam("LogFile", log_file)
     model.setParam("LogToConsole", 0)
-    model.setParam('TimeLimit', time * 60)
+    model.setParam('TimeLimit', config['time'] * 60)
 
     model.optimize()
 
@@ -303,7 +210,7 @@ if __name__ == "__main__":
         
         grbret['solcount'] = model.SolCount
 
-        if model.SolCount > 1:
+        if model.SolCount > 0:
             grbret['bestobj'] = model.getObjective().getValue()
 
             (Xs, Zs, R_sup, Rs) = grb_vars
@@ -311,19 +218,19 @@ if __name__ == "__main__":
 
             grbret['rho_tilde'] = rho.getValue()
             grbret['phi_tilde'] = phi.getValue()
-            grbret['rho'] = grbret['rho_tilde'] * rho_star
-            grbret['phi'] = grbret['phi_tilde'] * phi_star
+            grbret['rho'] = grbret['rho_tilde'] * config['rho_star']
+            grbret['phi'] = grbret['phi_tilde'] * config['phi_star']
 
-            Xs = [grb_vars_to_ndarray(X, dtype=int) for X in Xs]
-            Zs = [grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]    
-            Rs = [grb_vars_to_ndarray(R, dtype=int) for R in Rs]
-            R_sup = grb_vars_to_ndarray(R_sup, dtype=int)
+            Xs = [utils.grb_vars_to_ndarray(X, dtype=int) for X in Xs]
+            Zs = [utils.grb_vars_to_ndarray(Z, dtype=int) for Z in Zs]
+            Rs = [utils.grb_vars_to_ndarray(R, dtype=int) for R in Rs]
+            R_sup = utils.grb_vars_to_ndarray(R_sup, dtype=int)
 
             # sort X assignment, re-arrange subgraph id
             for i in range(len(Xs)):
                 # X: l \times m, assignee is subgraph index
                 Xs[i] = Xs[i].T
-                Xs[i], index = sorted_assignment(Xs[i], axis=0, with_index=True)
+                Xs[i], index = utils.sorted_assignment(Xs[i], axis=0, with_index=True)
                 Xs[i] = Xs[i].T
                 Zs[i] = Zs[i][:, index]
                 Rs[i] = Rs[i][:, index]
