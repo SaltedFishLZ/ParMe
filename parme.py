@@ -110,14 +110,13 @@ def get_parme_model(
         # assignment variables
         Z = model.addVars(t, m, name="Z", vtype=GRB.BINARY)
         Zs.append(Z)
-        # inverse yield (Y^-1) varibales
-        # since 0 <y <= 1, inv_y >= 1
-        inv_yield = model.addVars(t, name="inverse yield", lb=1.0)
-        # s: area for each template, a list
-        # s = model.addVars(t, name="template area")
-        s = [gp.quicksum(w0[i] * R_sup[i, j] for i in range(r)) for j in range(t)]
+        # s: area (mm^2) for each template
+        s = model.addVars(t, name="template area", lb=0.0)
+        model.addConstrs(s[k] >= gp.quicksum(w0[i] * R_sup[i, k] for i in range(r))
+                         for k in range(t))
+        # s = [gp.quicksum(w0[i] * R_sup[i, j] for i in range(r)) for j in range(t)]
         # template cost
-        phi_template = model.addVars(t, name="template cost", lb=0.0)
+        phi_template = model.addVars(t, name="template cost")
 
         # q_sup: aggregated product volumes for each template
         q_sup = [ gp.quicksum(Z[k, j] for j in range(m))
@@ -128,16 +127,18 @@ def get_parme_model(
         for constrs in merge_constrs:
             model.addConstrs(merge_constrs[constrs], name=constrs)
         
-        # yield constraits
-        alpha = 10
-        d0 = 0.001
-        model.addConstrs(inv_yield[k] >=
-                         1 + d0 * s[k] +
-                        (alpha - 1) / (2 * alpha) * (d0 ** 2) * (s[k] ** 2)
-                         for k in range(t))
-
         # template cost equation
-        model.addConstrs(phi_template[k] >= s[k] * inv_yield[k] for k in range(t))
+        alpha = 10
+        # defects per mm^2
+        d0 = 0.09 * 1e-1
+
+        p0 = 0.0; p1 = 1.0; p2 = d0
+        p3 = (alpha - 1) / (2 * alpha) * (d0 ** 2)
+
+        for k in range(t):
+            model.addGenConstrPoly(xvar=s[k], yvar=phi_template[k],
+                                   p=[p3, p2, p1, p0],
+                                   name='template RE cost model')
 
         phi_i = gp.quicksum(phi_template[k] * q_sup[k] for k in range(t))
 
@@ -151,8 +152,6 @@ def get_parme_model(
     objective = theta * rho_tilde + (1 - theta) * phi_tilde
     model.setObjective(objective)
     model.update()
-
-    model.setParam('NonConvex', 2)
 
     return model, (Xs, Zs, R_sup, Rs), (rho_tilde, phi_tilde)
 
