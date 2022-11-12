@@ -30,7 +30,7 @@ from EleNetX.utils import obj_attr_cat_to_int
 from EleNetX.visualize import plot_ele_nx
 
 import utils
-# from utils import *
+import visualize
 from parme import get_parme_model
 
 # Global Gurobi setting
@@ -83,65 +83,6 @@ def get_R0(G: nx.Graph,
     return R0
 
 
-def plot_input(G: nx.Graph,
-               out_dir: str,
-               name: str) -> None:
-
-    fig = plt.figure(figsize=(10, 10))
-    ax = plt.axes()
-
-    from networkx.drawing.nx_agraph import graphviz_layout
-    pos = graphviz_layout(G)
-
-    plot_ele_nx(G, ax,
-                pos=pos,
-                node_color_keyword="module")
-
-    os.makedirs(out_dir, exist_ok=True)
-    plt.savefig(os.path.join(out_dir, 'input.{}.png'.format(name)))
-    plt.savefig(os.path.join(out_dir, 'input.{}.pdf'.format(name)))
-
-    plt.clf(); plt.cla(); plt.close()
-
-
-def plot_output(G: nx.Graph,
-                X: np.ndarray,
-                out_dir: str,
-                name: str) -> None:
-    """
-    :param G:
-    :param X: $l \times m$
-    """
-    l = len(G.nodes)
-    l_, m = X.shape
-    assert l_ == l, ValueError('Shape mismatch')
-
-    sgids = utils.onehot_to_index(X, axis=1)
-
-    # print('=' * 64)
-    # print('# nodes: ', l)
-    # print('# subgraphs:', m)
-    # print('cluster id for nodes in ', name)
-    # print(sgids)
-
-    fig = plt.figure(figsize=(10, 10))
-    ax = plt.axes()
-
-    from networkx.drawing.nx_agraph import graphviz_layout
-    pos = graphviz_layout(G)
-    
-    nx.draw_networkx(G, ax=ax, pos=pos,
-                     node_color=sgids,
-                     cmap=plt.cm.magma, 
-                     with_labels=True)
-
-    os.makedirs(out_dir, exist_ok=True)
-    plt.savefig(os.path.join(out_dir, 'output.{}.png'.format(name)))
-    plt.savefig(os.path.join(out_dir, 'output.{}.pdf'.format(name)))
-
-    plt.clf(); plt.cla(); plt.close()
-
-
 if __name__ == "__main__":
     # FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
     # logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -179,7 +120,7 @@ if __name__ == "__main__":
         R0 = get_R0(G, module_indices)
         R0s.append(R0)
         print(name)
-        plot_input(G=G, out_dir=args.output, name=name)
+        visualize.plot_input(G=G, out_dir=args.output, name=name)
     print('=' * 64)
     
     # build Gurobi model
@@ -247,14 +188,14 @@ if __name__ == "__main__":
                 # print(i, name)
                 G = Gs[name]
                 X = Xs[i]
-                plot_output(G=G, X=X, out_dir=args.output, name=name)
+                visualize.plot_output(G=G, X=X, out_dir=args.output, name=name)
             
             # dump np results to pickle files
             utils.dump_pickle_results(out_dir=args.output,
                                       Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
             # dump np results to text files
             utils.dump_text_results(out_dir=args.output,
-                                      Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
+                                    Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
 
         else:
             print('[GRB] no feasible solution found')
