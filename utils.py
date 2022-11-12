@@ -245,6 +245,12 @@ def get_argparser(name='experiment parser') -> argparse.ArgumentParser:
     )
     parser.add_argument('--output', '-o', type=str, required=True,
                         help='output directory')
+    parser.add_argument('--time', metavar='TIME',
+                        type=float, default=5,
+                        help='run time limit (min) for each optimization')
+    parser.add_argument('--threads', metavar='NUM THREADS',
+                        type=int, default=8,
+                        help='number of threads used by Gurobi')
     parser.add_argument('--t', '-t',
                         type=int, default=1,
                         help='number of templates')
@@ -263,9 +269,6 @@ def get_argparser(name='experiment parser') -> argparse.ArgumentParser:
     parser.add_argument('--q', '-q', metavar='%f', nargs='+',
                         type=float, default=None, 
                         help='quantity weight for each G')
-    parser.add_argument('--time', metavar='TIME',
-                        type=float, default=5,
-                        help='run time limit (min) for each optimization')
     parser.add_argument('--rho-star', metavar='rho*',
                         type=float, default=1.,
                         help='precalculated rho* used to scale rho')

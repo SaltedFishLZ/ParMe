@@ -197,6 +197,7 @@ if __name__ == "__main__":
     model.setParam("LogFile", log_file)
     model.setParam("LogToConsole", 0)
     model.setParam('TimeLimit', config['time'] * 60)
+    model.setParam('Threads', args.threads)
 
     model.optimize()
 
