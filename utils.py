@@ -18,6 +18,14 @@ import json
 import pickle
 import argparse
 
+if sys.version <= "3.7":
+    try:
+        from collections.abc import OrderedDict
+    except ImportError:
+        from collections import OrderedDict
+else:
+    OrderedDict = dict
+
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
@@ -96,8 +104,8 @@ def assignment_to_catalog(assignment: np.ndarray) -> dict:
     key: assignee
     value: a list of tasks
     """
-    # only support 2d assignment: 1d tasks
-    assert len(assignement.shape) == 2, NotImplementedError()
+    # 1d array, for each task there is an assignee id
+    assert len(assignment.shape) == 1, NotImplementedError()
     # a pointer dict contains the indices/pointers of
     # tasks/jobs/content for each assignee
     catalog = dict()
@@ -106,7 +114,7 @@ def assignment_to_catalog(assignment: np.ndarray) -> dict:
         if assignee in catalog:
             catalog[assignee].append(task)
         else:
-            cluster[assignee] = [task, ]
+            catalog[assignee] = [task, ]
     return catalog
 
 
@@ -217,22 +225,72 @@ def dump_text_results(out_dir: str, Xs, Zs, Rs, R_sup):
                R_sup, fmt='%d')
 
 
+# NumPy JSON enconder
+# reference: 
+# https://stackoverflow.com/questions/50916422/python-typeerror-object-of-type-int64-is-not-json-serializable
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        else:
+            return super(NpEncoder, self).default(obj)
+
+
 def dict_to_json(d: dict):
     jsonable = copy.deepcopy(d)
-    # convert unjsonbale objects
-    for key in jsonable:
-        val = jsonable[key]
-        # deal with ndarray values
-        if isinstance(val, np.ndarray):            
-            # NOTE: please use d[key] to modify
-            # the content of a dictionary record
-            jsonable[key] = val.tolist()
-    json_object = json.dumps(jsonable, indent=4)
+    # # convert unjsonbale objects
+    # for key in jsonable:
+    #     val = jsonable[key]
+    #     # deal with ndarray values
+    #     if isinstance(val, np.ndarray):            
+    #         # NOTE: please use d[key] to modify
+    #         # the content of a dictionary record
+    #         jsonable[key] = val.tolist()
+    json_object = json.dumps(jsonable, cls=NpEncoder, indent=4)
     return json_object 
 
 
-def dump_json_results():
-    pass
+def dump_json_results(Xs, Zs, Rs, R_sup, Gs,
+                      out_dir: str):
+    n = len(Xs); r, t = R_sup.shape
+    n_ = len(Zs); assert n_ == n ,ValueError()
+    n_ = len(Rs); assert n_ == n ,ValueError()
+    n_ = len(Gs); assert n_ == n ,ValueError()
+
+    os.makedirs(out_dir, exist_ok=True)
+    
+    for i, gname in enumerate(Gs):
+        X = Xs[i]; G = Gs[gname]
+        l, m = X.shape; l_ = len(G.nodes); assert l_ == l, ValueError()
+        # subgraph assignments for nodes
+        assignment = onehot_to_index(onehot=X)
+        # since node names might not be numbers or might not be 0, 1, ...
+        # we use a dict to record the subgraph assignment for each node
+        v_names = [v for v in G.nodes]
+        v_sG_map = dict(zip(v_names, assignment.tolist()))
+        # dump v-sG-map to json
+        fpath = os.path.join(out_dir, '{}.v-sG-map.json'.format(gname))
+        with open(fpath, 'w') as fp:
+            json.dump(v_sG_map, fp, cls=NpEncoder, indent=4)
+        # nodes catalogs for each subgraph
+        print(assignment)
+        catalogs = assignment_to_catalog(assignment=assignment)
+        sG_v_map = dict()
+        for sG_id in range(m):
+            sG_v_map[sG_id] = []
+            for v_id in catalogs[sG_id]:
+                v = v_names[v_id]
+                sG_v_map[sG_id].append(v)
+        # dump sG-v-map to json
+        fpath = os.path.join(out_dir, '{}.sG-v-map.json'.format(gname))
+        with open(fpath, 'w') as fp:
+            json.dump(sG_v_map, fp, cls=NpEncoder, indent=4)
 
 
 # ---------------------------------------------------------------- #

@@ -197,6 +197,9 @@ if __name__ == "__main__":
             utils.dump_text_results(out_dir=args.output,
                                     Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup)
 
+            utils.dump_json_results(Xs=Xs, Zs=Zs, Rs=Rs, R_sup=R_sup,
+                                    Gs=Gs, out_dir=args.output)
+
         else:
             print('[GRB] no feasible solution found')
     elif (model.status == GRB.INFEASIBLE):
