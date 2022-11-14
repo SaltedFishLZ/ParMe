@@ -76,7 +76,9 @@ def get_parme_model(
         # connection equation:
         # w = w0^T R0 (w is a constant for each G)
         w = w0.T @ R0
+        # print('w =', w)
         # get m subgraphs
+        print('design size =', w.sum())
         m = int(np.floor(w.sum() / min_size))
         m = min(l, m)
         print("m = ", m)
@@ -84,9 +86,11 @@ def get_parme_model(
         X = model.addVars(l, m, vtype=GRB.BINARY)
         Xs.append(X)
         # set constraints
+        # the merge will enlarge the size,
+        # we allow each original subgraph to take 70% of the space of the final chiplet
         partition_constrs = get_partition_constraints(X=X, w=w, 
-                                                      max_size=max_size,
-                                                      min_size=min_size)
+                                                      max_size=max_size * 0.7,
+                                                      min_size=min_size * 0.7)
         for constrs in partition_constrs:
             model.addConstrs(partition_constrs[constrs], name=constrs)
         # the cut size of an input G^i
