@@ -43,10 +43,14 @@ def get_parme_model(
     max_size,
     min_size,
     theta,
+    alpha: int = 10,
+    d0: float = 0.09 * 1e-2,
     rho_star: float = 1.0,
     phi_star: float = 1.0
 ):
     """
+    :param alpha: critical levels
+    :param: d0 defects per mm^2
     """
     # sanity check
     n = len(Ls); assert n == len(q)
@@ -85,10 +89,34 @@ def get_parme_model(
                                                       min_size=min_size)
         for constrs in partition_constrs:
             model.addConstrs(partition_constrs[constrs], name=constrs)
-        # update objective
+        # the cut size of an input G^i
         rho_i = get_partition_objective(X, L)
+        # quantity-weighted
         rho += q[i] * rho_i
 
+    # -------------------------------- #
+    #    Template Auxilary Variables   #
+    # -------------------------------- #
+    # Auxilary variables shared across all input graphs
+    # s: area (mm^2) for each template
+    # 800 mm^2 area upper bound
+    # NOTE: change it to a parameter
+    s = model.addVars(t, name="template area", lb=0.0, ub=8e2)
+    model.addConstrs(s[k] >= gp.quicksum(w0[i] * R_sup[i, k] for i in range(r))
+                        for k in range(t))
+    # phi_template: template cost
+    phi_template = model.addVars(t, name="template cost")
+    # calculate the RE cost using
+    # 3rd order expansion
+    p0 = 0.0; p1 = 1.0; p2 = d0
+    p3 = (alpha - 1) / (2 * alpha) * (d0 ** 2)
+    for k in range(t):
+        constr = model.addGenConstrPoly(xvar=s[k],
+                                        yvar=phi_template[k],
+                                        p=[p3, p2, p1, p0],
+                                        name='T_{} RE cost'.format(k))
+        model.update()
+        constr.setAttr('FuncPieceError', 1e-4)
 
     # -------------------------------- #
     #           Merge Part             #
@@ -110,15 +138,9 @@ def get_parme_model(
         # assignment variables
         Z = model.addVars(t, m, name="Z", vtype=GRB.BINARY)
         Zs.append(Z)
-        # s: area (mm^2) for each template
-        s = model.addVars(t, name="template area", lb=0.0)
-        model.addConstrs(s[k] >= gp.quicksum(w0[i] * R_sup[i, k] for i in range(r))
-                         for k in range(t))
-        # s = [gp.quicksum(w0[i] * R_sup[i, j] for i in range(r)) for j in range(t)]
-        # template cost
-        phi_template = model.addVars(t, name="template cost")
 
         # q_sup: aggregated product volumes for each template
+        # NOTE: the scope is limited to input G^i
         q_sup = [ gp.quicksum(Z[k, j] for j in range(m))
                   for k in range(t) ] # template k in [t]
 
@@ -127,21 +149,10 @@ def get_parme_model(
         for constrs in merge_constrs:
             model.addConstrs(merge_constrs[constrs], name=constrs)
         
-        # template cost equation
-        alpha = 10
-        # defects per mm^2
-        d0 = 0.09 * 1e-1
-
-        p0 = 0.0; p1 = 1.0; p2 = d0
-        p3 = (alpha - 1) / (2 * alpha) * (d0 ** 2)
-
-        for k in range(t):
-            model.addGenConstrPoly(xvar=s[k], yvar=phi_template[k],
-                                   p=[p3, p2, p1, p0],
-                                   name='template RE cost model')
-
+        # get the RE costs of all subgraphs in G^i
         phi_i = gp.quicksum(phi_template[k] * q_sup[k] for k in range(t))
 
+        # weighted by quantity
         phi += q[i] * phi_i
 
     # normalize 2 objectives
