@@ -110,7 +110,7 @@ def assignment_to_catalog(assignment: np.ndarray) -> dict:
     # tasks/jobs/content for each assignee
     catalog = dict()
     # update catalog
-    for task, assignee in enumerate(list(assignment)):
+    for task, assignee in enumerate(assignment.tolist()):
         if assignee in catalog:
             catalog[assignee].append(task)
         else:
@@ -211,6 +211,7 @@ def load_pickle_results(out_dir: str):
 def dump_text_results(out_dir: str, Xs, Zs, Rs, R_sup):
     """
     """
+    out_dir = os.path.join(out_dir, 'text')
     os.makedirs(out_dir, exist_ok=True)
     for i, X in enumerate(Xs):
         np.savetxt(os.path.join(out_dir, 'X-{}.txt'.format(i)),
@@ -263,11 +264,15 @@ def dump_json_results(Xs, Zs, Rs, R_sup, Gs,
     n_ = len(Rs); assert n_ == n ,ValueError()
     n_ = len(Gs); assert n_ == n ,ValueError()
 
+    out_dir = os.path.join(out_dir, 'json')
     os.makedirs(out_dir, exist_ok=True)
     
     for i, gname in enumerate(Gs):
-        X = Xs[i]; G = Gs[gname]
-        l, m = X.shape; l_ = len(G.nodes); assert l_ == l, ValueError()
+        G = Gs[gname]; X = Xs[i]; Z = Zs[i]
+        l, m = X.shape
+        l_ = len(G.nodes); assert l_ == l, ValueError()
+        t, m_ = Z.shape; assert m_ == m, ValueError()
+        # -------------------------------- #
         # subgraph assignments for nodes
         assignment = onehot_to_index(onehot=X)
         # since node names might not be numbers or might not be 0, 1, ...
@@ -278,8 +283,9 @@ def dump_json_results(Xs, Zs, Rs, R_sup, Gs,
         fpath = os.path.join(out_dir, '{}.v-sG-map.json'.format(gname))
         with open(fpath, 'w') as fp:
             json.dump(v_sG_map, fp, cls=NpEncoder, indent=4)
+        # -------------------------------- #
         # nodes catalogs for each subgraph
-        print(assignment)
+        # print(assignment)
         catalogs = assignment_to_catalog(assignment=assignment)
         sG_v_map = dict()
         for sG_id in range(m):
@@ -291,6 +297,22 @@ def dump_json_results(Xs, Zs, Rs, R_sup, Gs,
         fpath = os.path.join(out_dir, '{}.sG-v-map.json'.format(gname))
         with open(fpath, 'w') as fp:
             json.dump(sG_v_map, fp, cls=NpEncoder, indent=4)
+        # -------------------------------- #
+        # template assignments for subgraphs
+        assignment = onehot_to_index(onehot=Z, axis=0)
+        # print(Z)
+        # print(assignment)
+        sG_t_map = dict(zip(list(range(m)), assignment.tolist()))
+        # dump sG_t_map to json
+        fpath = os.path.join(out_dir, '{}.sG-t-map.json'.format(gname))
+        with open(fpath, 'w') as fp:
+            json.dump(sG_t_map, fp, cls=NpEncoder, indent=4)
+        # # -------------------------------- #
+        # subgraph catalogs for each template
+        t_sG_map = assignment_to_catalog(assignment=assignment)
+        fpath = os.path.join(out_dir, '{}.t-sG-map.json'.format(gname))
+        with open(fpath, 'w') as fp:
+            json.dump(t_sG_map, fp, cls=NpEncoder, indent=4)
 
 
 # ---------------------------------------------------------------- #

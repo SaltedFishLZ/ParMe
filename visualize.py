@@ -146,6 +146,7 @@ def plot_output(G: nx.Graph,
         
     #     nx.draw_networkx(ax=ax, G=sG, pos=pos, width=np.power(normalized_sub_edge_widths, 0.3) )
 
+    out_dir = os.path.join(out_dir, 'figures')
     os.makedirs(out_dir, exist_ok=True)
     plt.savefig(os.path.join(out_dir, 'output.{}.png'.format(name)))
     plt.savefig(os.path.join(out_dir, 'output.{}.pdf'.format(name)))
