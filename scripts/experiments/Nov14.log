@@ -1,0 +1,649 @@
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t2_1.bash 
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.4/gurobi.1668454714.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 2 1 1 1 1 1 1 1 1 1 1 1 2 0 0 0 2 2 2 0 0 0 5 5 5 0 0 0 5 5 5 5 2]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 7 5 6 4 4 5 4 4 5 5 4 5 5 3 2 5 2 2 2 2 7 1 2 7 1 2 3 1 1 3 1 1 0 0 1 0 0 0 0 3 3 0]
+[7 7 7 6 7 7 7 7 5 5 5 5 5 7 5 5 4 4 4 4 4 4 3 3 3 3 2 2 2 2 2 2 2 3 3 1 1 3 1 5 5 5 1 5 1 1 1 1 0 0 0 0 0 0 0 6 6 6 6 6]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2754198295636527
+rho_tilde                       : 1.350282394431694
+phi_tilde                       : 1.2255114529849664
+rho                             : 124801292591.8421
+phi                             : 3218.1202190100485
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.45/gurobi.1668456517.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 2 1 1 1 1 1 1 1 1 1 1 1 2 5 5 5 2 2 2 5 5 5 5 5 5 0 0 0 0 0 0 0 2]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 5 4 6 5 5 4 3 3 4 4 3 4 4 3 2 4 2 2 2 2 1 0 2 3 0 2 5 0 0 5 0 0 1 1 0 1 1 1 1 7 7 7]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 4 3 3 3 3 3 2 2 4 4 2 2 4 2 6 6 6 3 6 3 3 1 1 1 1 1 1 1 0 0 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2860412880855774
+rho_tilde                       : 1.3251865976819057
+phi_tilde                       : 1.254013307506762
+rho                             : 122481786771.4956
+phi                             : 3292.9643945519956
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.5/gurobi.1668458320.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 0 2]
+[7 7 7 6 6 6 6 6 6 6 6 6 7 5 6 7 7 5 5 4 5 5 3 5 5 2 2 5 2 4 1 2 3 1 2 3 1 2 2 1 1 3 1 1 3 0 1 0 0 0 0 4 4 4]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 5 4 4 3 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 6 2 6 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2800074779445463
+rho_tilde                       : 1.1148749068008617
+phi_tilde                       : 1.4451400490882251
+rho                             : 103043504100.13106
+phi                             : 3794.8518554800003
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.55/gurobi.1668460122.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 1 1 1 1 1 0 0 0 0 0]
+[7 6 6 7 7 7 7 7 7 7 7 7 5 4 7 4 5 4 4 6 4 4 3 4 4 2 2 4 2 6 1 2 5 1 2 3 1 1 5 1 1 6 1 1 5 0 1 0 0 0 0 3 3 3]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 3 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 6 6 6 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2622446064780697
+rho_tilde                       : 1.0508920999029834
+phi_tilde                       : 1.5205643367365087
+rho                             : 97129824830.19566
+phi                             : 3992.9115508783334
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.6/gurobi.1668461925.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 1 1 1 1 1 0 0 0 0 0]
+[7 6 6 7 7 7 7 7 7 7 7 7 5 4 7 4 6 4 4 5 4 4 3 4 4 2 2 4 2 6 1 2 6 1 2 5 1 1 5 1 1 5 1 1 3 0 1 0 0 0 0 3 3 3]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 3 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 6 6 6 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2387609968385624
+rho_tilde                       : 1.0508920999029834
+phi_tilde                       : 1.5205643422419335
+rho                             : 97129824830.19566
+phi                             : 3992.911565335252
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t2_
+run_t2_1.bash  run_t2_2.bash  
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t2_2.bash 
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.1/gurobi.1668469916.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 3 3 3 3 3 3 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 2 2 2 0 0 5 0 0 0 5 5 5 4 4 4 4 4]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 6 6 6 7 6 6 7 7 7 7 7 5 4 7 5 5 4 3 3 4 4 3 4 4 5 2 4 2 2 2 2 3 1 2 5 1 2 3 1 1 3 1 1 0 0 1 0 0 0 0 5 5 0]
+[7 7 6 6 6 7 6 6 6 5 4 3 2 6 2 2 5 5 5 5 5 5 1 1 1 1 3 3 3 3 3 3 3 1 1 0 2 1 2 2 2 0 7 2 7 7 7 7 4 4 4 4 4 4 4 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.1399833877682601
+rho_tilde                       : 1.9558212689051624
+phi_tilde                       : 1.0493347343086055
+rho                             : 180768869863.48743
+phi                             : 2755.490629453534
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.2/gurobi.1668471719.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 3 3 3 3 3 3 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 4 4 4 0 0 0 0 0 0 3 3 3 0 0 0 5 5 5 5 4]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 7 7 6 6 6 6 6 5 4 6 5 5 4 5 5 4 4 3 4 4 5 2 4 2 2 2 2 7 1 2 3 1 2 3 1 1 3 1 1 0 0 1 0 0 0 0 3 3 0]
+[7 7 6 6 6 7 6 6 6 5 4 7 3 6 4 4 2 2 2 2 2 2 1 1 1 1 5 5 5 5 5 5 5 1 1 7 7 1 7 4 4 2 0 4 0 0 0 4 4 0 0 0 0 3 3 3 3 3 3 3]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2251757591661565
+rho_tilde                       : 1.7522281203007208
+phi_tilde                       : 1.0934126688825174
+rho                             : 161951555638.361
+phi                             : 2871.236665215999
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.3/gurobi.1668473522.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 2 1 1 1 1 1 2 1 1 0 1 1 0 0 0 0 2 2 2 1 1 4 5 5 5 5 5 5 3 3 2 4 0]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 5 4 6 7 7 4 5 5 4 4 3 4 4 5 2 4 2 2 2 2 7 1 2 5 1 2 3 1 1 3 1 1 0 0 1 0 0 0 0 3 3 0]
+[7 7 7 6 7 7 7 7 7 5 4 3 2 7 4 4 3 3 3 3 3 3 3 4 6 2 2 2 2 2 2 1 1 6 6 6 6 6 6 4 4 0 1 4 1 1 1 4 5 5 5 5 5 5 5 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2573452584691507
+rho_tilde                       : 1.4982138992775318
+phi_tilde                       : 1.154115840979846
+rho                             : 138474019938.32227
+phi                             : 3030.6395863463135
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.7/gurobi.1668475324.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 1 1 1 1 1 0 0 0 0 0]
+[7 7 7 6 6 6 6 6 6 6 6 6 5 4 6 4 3 4 4 3 4 4 5 4 4 2 2 4 2 3 1 2 7 1 2 7 1 1 7 1 1 3 1 1 3 0 1 0 0 0 0 5 5 5]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 3 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 6 2 6 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.1919960387147068
+rho_tilde                       : 1.0456144388058977
+phi_tilde                       : 1.5335531051685676
+rho                             : 96642031366.03278
+phi                             : 4027.0192845999873
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.8/gurobi.1668477127.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 0 0 0 0 0]
+[7 6 6 7 7 7 7 7 7 7 7 7 6 5 7 4 4 5 5 4 5 5 4 5 5 3 2 5 1 1 2 3 3 2 6 6 2 2 4 2 2 3 2 2 3 0 2 0 0 0 0 1 1 1]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 4 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 6 2 6 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.1355612709229823
+rho_tilde                       : 1.013510023177355
+phi_tilde                       : 1.6237662619055468
+rho                             : 93674746459.65276
+phi                             : 4263.913671028506
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.9/gurobi.1668478930.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 0 0 0 0 0]
+[7 7 7 6 6 6 6 6 6 6 6 6 5 4 6 5 5 4 4 3 4 4 5 4 4 3 2 4 3 3 2 7 7 2 1 1 2 2 3 2 2 5 2 2 7 0 2 0 0 0 0 1 1 1]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 4 4 4 4 3 3 3 3 3 3 3 4 4 4 4 4 4 6 6 2 2 6 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.074428901515696
+rho_tilde                       : 1.0100659347856331
+phi_tilde                       : 1.6536956020862237
+rho                             : 93356422911.28984
+phi                             : 4342.5063390468
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t2_boundary.bash 
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.001/gurobi.1668490296.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 5 5 5 3 3 3 5 5 2 3 3 2 3 3 1 5 5 2 5 5 2 2 2 2 1 1 1 0 0 0 4 4 4 0 0 0 0 0 1 3 1]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 5 5 6 7 7 6 6 4 4 3 4 4 3 4 4 3 3 7 3 3 5 2 3 2 2 2 2 4 1 2 5 1 2 5 1 1 5 1 1 0 0 1 0 0 0 0 7 7 0]
+[7 7 7 7 7 7 7 7 6 5 6 4 3 6 6 6 2 2 2 2 2 2 3 3 3 3 4 4 4 4 4 4 4 3 3 1 1 3 1 6 6 0 1 6 1 1 1 1 5 5 5 5 5 5 5 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.0014099909744323
+rho_tilde                       : 2.4099929581072113
+phi_tilde                       : 0.999999998014339
+rho                             : 222746173355.54105
+phi                             : 2625.940544889734
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_2_theta_0.999/gurobi.1668492099.log"
+[GRB] reach time limit
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 0 0 0 0 0]
+[7 7 7 6 6 6 6 6 6 6 6 6 7 5 6 4 4 5 5 4 5 5 3 5 5 7 2 5 4 4 2 1 1 2 3 3 2 2 3 2 2 7 2 2 3 0 2 0 0 0 0 1 1 1]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 5 6 5 4 4 4 4 4 4 3 3 5 5 3 3 5 3 6 6 2 2 6 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.0008034147392844
+rho_tilde                       : 0.9999999999999661
+phi_tilde                       : 1.8034147393064601
+rho                             : 92426068136.92789
+phi                             : 4735.659892599999
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t1_boundary.bash 
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.001/gurobi.1668493945.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 5 5 5 4 4 4 3 3 3 4 5]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 5 6 6 4 6 3 3 4 7 7 4 4 3 4 4 3 2 4 2 2 2 2 5 1 2 5 1 2 7 1 1 3 1 1 0 0 1 0 0 0 0 5 5 0]
+[7 7 6 6 6 7 6 6 5 5 5 5 5 6 5 5 4 4 4 4 4 4 4 5 3 7 7 7 7 7 7 6 6 3 3 3 3 3 3 5 5 2 2 5 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.0006401426838205
+rho_tilde                       : 1.6401177868243046
+phi_tilde                       : 1.0000000249219183
+rho                             : 151589568215.1359
+phi                             : 4319.399691769195
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.999/gurobi.1668495747.log"
+[GRB] get optimal
+[5 5 5 5 5 5 5 5 5 5 5 5 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 0 0 0 0 0]
+[7 6 6 7 7 7 7 7 7 7 7 7 5 4 7 6 6 4 4 5 4 4 5 4 4 3 2 4 1 1 2 3 3 2 3 3 2 2 6 2 2 5 2 2 5 0 2 0 0 0 0 1 1 1]
+[7 7 7 7 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 5 6 5 4 4 4 4 4 4 3 3 5 5 3 3 5 3 6 6 2 2 6 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 2
+solcount                        : 10
+bestobj                         : 1.000779650105635
+rho_tilde                       : 1.0000004624492163
+phi_tilde                       : 1.779188118867014
+rho                             : 92426068136.92932
+phi                             : 7685.024420708042
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ bash run_t1_1.bash 
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.4/gurobi.1668496007.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 3 3 3 3 3 3 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 4 4 4 3 3 3 5 5 5 5 4]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 6 5 6 4 4 5 3 3 5 5 4 5 5 3 2 5 2 2 2 2 4 1 2 3 1 2 4 1 1 3 1 1 0 0 1 0 0 0 0 7 7 7]
+[7 7 6 6 6 7 6 6 5 5 5 5 5 6 5 5 4 4 4 4 4 4 4 5 3 7 7 7 7 7 7 6 6 3 3 3 3 3 3 5 5 2 2 5 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2198778224964117
+rho_tilde                       : 1.4017716669033464
+phi_tilde                       : 1.098615259558452
+rho                             : 129560183682.62029
+phi                             : 4745.358295246279
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.45/gurobi.1668497810.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 5 5 5 5 5]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 6 5 6 7 7 5 4 4 5 5 4 5 5 7 3 5 3 3 3 3 2 1 3 4 1 3 2 1 1 4 1 1 0 0 1 0 0 0 0 2 2 2]
+[7 7 7 6 7 7 7 7 5 5 5 5 5 7 5 5 4 4 4 4 4 4 4 5 6 3 3 3 3 3 3 7 7 6 6 6 6 6 6 5 5 2 2 5 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2338038749706686
+rho_tilde                       : 1.26634644178624
+phi_tilde                       : 1.207178138485202
+rho                             : 117043368386.87904
+phi                             : 5214.284749333513
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.5/gurobi.1668499612.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1 1 1 5 5 5 5 5 5 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 1 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 6 5 6 4 4 5 7 7 5 5 3 5 5 7 2 5 2 2 2 2 4 1 2 4 1 2 4 1 1 3 1 1 0 0 1 0 0 0 0 3 3 3]
+[7 7 7 6 7 7 7 7 6 6 6 6 6 7 6 6 5 5 5 5 5 5 5 6 4 3 3 3 3 3 3 7 7 4 4 4 4 4 4 6 6 2 2 6 2 2 2 2 1 1 1 1 1 1 1 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2367623324223742
+rho_tilde                       : 1.2663465275140815
+phi_tilde                       : 1.2071781373306674
+rho                             : 117043376310.3627
+phi                             : 5214.284744346616
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.55/gurobi.1668501415.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 5 5 5 5 5 5 5 5 5 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 0 2]
+[7 7 7 6 6 6 6 6 6 6 6 6 6 5 6 4 4 5 5 3 5 5 4 5 5 2 2 5 2 4 1 2 3 1 2 3 1 2 3 1 1 4 1 1 3 0 1 0 0 0 0 7 7 7]
+[7 7 7 6 7 7 7 7 5 5 5 5 5 7 5 5 4 4 4 4 4 4 3 3 3 3 2 2 2 2 2 6 6 3 3 6 6 3 6 5 5 5 5 5 5 5 1 1 1 1 1 1 1 1 3 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2293268045585002
+rho_tilde                       : 1.1696969835662718
+phi_tilde                       : 1.3022076968823422
+rho                             : 108110443107.06726
+phi                             : 5624.755384353367
+================================================================
+reading input graphs
+mobilenetv2:0
+qt.qpa.plugin: Could not find the Qt platform plugin "wayland" in ""
+resnet18:0
+resnet50:0
+yolov5:0
+================================================================
+Set parameter Username
+Academic license - for non-commercial use only - expires 2023-06-24
+design size = 542.0
+m =  6
+design size = 247.0
+m =  3
+design size = 647.0
+m =  8
+design size = 655.0
+m =  8
+Set parameter LogFile to value "experiments/t_1_theta_0.6/gurobi.1668503218.log"
+[GRB] reach time limit
+[5 5 5 4 4 4 4 4 4 4 4 4 3 3 3 3 3 3 3 3 3 5 5 5 5 5 5 5 5 5 2 2 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 0 0 0 0 0]
+[2 2 2 2 2 2 1 2 1 1 1 0 1 0 0 0 0 0 0 0 1]
+[7 7 7 6 6 6 6 6 6 6 6 6 6 5 6 4 4 5 5 3 5 5 3 5 5 2 2 5 2 7 1 2 3 1 2 3 1 2 7 1 1 7 1 1 3 0 1 0 0 0 0 4 4 4]
+[7 7 7 6 7 7 7 7 5 5 5 5 5 7 5 5 4 4 4 4 4 4 3 3 3 3 2 2 2 2 2 6 6 3 3 6 6 3 6 5 5 5 5 5 5 5 1 1 1 1 1 1 1 1 3 0 0 0 0 0]
+================================================================
+status                          : 9
+solcount                        : 10
+bestobj                         : 1.2227012692603538
+rho_tilde                       : 1.1696969841790297
+phi_tilde                       : 1.3022076968823353
+rho                             : 108110443163.70203
+phi                             : 5624.755384353338
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ ^C
+(parme) zhliang@creator8re:~/Workspaces/ParMe-exp$ 

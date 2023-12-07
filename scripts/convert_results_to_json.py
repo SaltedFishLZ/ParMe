@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     Gs = run_mpdl.load_graphs()
     module_indices = run_mpdl.get_module_index(Gs)
+    print(module_indices)
 
     out_dir = args.output
 
